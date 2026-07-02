@@ -22,11 +22,12 @@
   <main class="site-main">
     <section class="hero hero-grid">
       <div class="hero-copy">
-        <p class="eyebrow">Linux • Infrastructure • AI • Software</p>
-        <h1>Systems administrator and software developer building practical tools.</h1>
+        <p class="eyebrow">Windows •  Linux • Infrastructure • AI • Software</p>
+        <h1>Systems administrator and software developer building practical infrastructure and desktop tools.</h1>
         <p>
-          I combine 25+ years of enterprise IT experience with modern software
-          development in Rust, C#, Go, Python, Linux, and AI-assisted systems.
+          I combine 25+ years of enterprise IT experience with infrastructure,
+          desktop, and software development in Rust, C#, Go, Python, Windows,
+          Linux, and AI-assisted systems.
         </p>
         <div class="actions">
           <a class="button" href="projects.html">View Projects</a>
@@ -73,7 +74,13 @@
             <p class="project-kicker">Wayland desktop environment</p>
           </div>
         </div>
-        <div class="project-visual project-visual--focaldesk" aria-hidden="true"></div>
+        <div class="project-visual project-visual--focaldesk">
+          <img
+            class="project-visual-image project-visual-image--contain"
+            src="assets/focaldesk-screenshot.png"
+            alt="FocalDesk desktop environment screenshot"
+          >
+        </div>
         <p>Rust Wayland desktop environment with compositor, launcher, settings, capture, and AI integration.</p>
       </article>
 
@@ -85,7 +92,31 @@
             <p class="project-kicker">AI desktop assistant</p>
           </div>
         </div>
-        <div class="project-visual project-visual--focal-agent" aria-hidden="true"></div>
+        <div class="project-visual project-visual--focal-agent" aria-hidden="true">
+          <div class="visual-assistant">
+            <div class="visual-assistant-shell">
+              <div class="visual-assistant-top">
+                <span class="visual-terminal-dot dot-red"></span>
+                <span class="visual-terminal-dot dot-yellow"></span>
+                <span class="visual-terminal-dot dot-green"></span>
+                <span class="visual-assistant-title">focal-agent</span>
+                <span class="visual-terminal-badge">Ready</span>
+              </div>
+              <div class="visual-assistant-body">
+                <div class="visual-assistant-chips">
+                  <span>Voice</span>
+                  <span>Plugins</span>
+                  <span>System</span>
+                </div>
+                <div class="visual-assistant-thread">
+                  <div class="assistant-message assistant-message--user">Open notes and summarize the meeting.</div>
+                  <div class="assistant-message assistant-message--agent">Launching app, extracting actions, saving summary.</div>
+                  <div class="assistant-message assistant-message--result">Done · 4 tasks · 1 follow-up</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <p>Windows AI assistant concept with plugins, system actions, voice, and local/cloud LLM support.</p>
       </article>
 
@@ -97,7 +128,13 @@
             <p class="project-kicker">Operations tooling</p>
           </div>
         </div>
-        <div class="project-visual project-visual--infra" aria-hidden="true"></div>
+        <div class="project-visual project-visual--infra">
+          <img
+            class="project-visual-image"
+            src="assets/infrastructure-admin-graphic.png"
+            alt="Infrastructure administration dashboard visualization"
+          >
+        </div>
         <p>Monitoring, VMware migration, OpenNMS dashboards, document automation, and internal business tools.</p>
       </article>
     </section>

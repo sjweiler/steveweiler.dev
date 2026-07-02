@@ -25,7 +25,7 @@
 
     <section class="page-header">
         <h1>Projects</h1>
-        <p>A selection of software, infrastructure, and open-source projects.</p>
+        <p>A selection of desktop, infrastructure, and automation projects.</p>
     </section>
 
     <section class="cards">
@@ -39,18 +39,12 @@
                 </div>
             </div>
 
-            <div class="project-visual project-visual--focaldesk" aria-hidden="true">
-                <div class="visual-window">
-                    <span></span><span></span><span></span>
-                </div>
-                <div class="visual-layout">
-                    <div class="visual-sidebar"></div>
-                    <div class="visual-main">
-                        <div class="visual-line large"></div>
-                        <div class="visual-line"></div>
-                        <div class="visual-line short"></div>
-                    </div>
-                </div>
+            <div class="project-visual project-visual--focaldesk">
+                <img
+                    class="project-visual-image project-visual-image--contain"
+                    src="assets/focaldesk-screenshot.png"
+                    alt="FocalDesk desktop environment screenshot"
+                >
             </div>
 
             <p>
@@ -74,10 +68,28 @@
             </div>
 
             <div class="project-visual project-visual--focal-agent" aria-hidden="true">
-                <div class="visual-chat">
-                    <div class="chat-bubble left"></div>
-                    <div class="chat-bubble right"></div>
-                    <div class="chat-bubble left short"></div>
+                <div class="visual-assistant">
+                    <div class="visual-assistant-shell">
+                        <div class="visual-assistant-top">
+                            <span class="visual-terminal-dot dot-red"></span>
+                            <span class="visual-terminal-dot dot-yellow"></span>
+                            <span class="visual-terminal-dot dot-green"></span>
+                            <span class="visual-assistant-title">assistant.log</span>
+                            <span class="visual-terminal-badge">Active</span>
+                        </div>
+                        <div class="visual-assistant-body">
+                            <div class="visual-assistant-chips">
+                                <span>Desktop</span>
+                                <span>Voice</span>
+                                <span>Automation</span>
+                            </div>
+                            <div class="visual-assistant-thread">
+                                <div class="assistant-message assistant-message--user">Capture this screen and draft the follow-up.</div>
+                                <div class="assistant-message assistant-message--agent">Opening capture tool, generating summary, queueing tasks.</div>
+                                <div class="assistant-message assistant-message--result">Completed · 3 actions · 2 plugins</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -101,9 +113,27 @@
             </div>
 
             <div class="project-visual project-visual--infra" aria-hidden="true">
-                <div class="visual-grid">
-                    <span></span><span></span><span></span><span></span>
-                    <span></span><span></span><span></span><span></span>
+                <div class="visual-terminal">
+                    <div class="visual-terminal-shell">
+                        <div class="visual-terminal-top">
+                            <span class="visual-terminal-dot dot-red"></span>
+                            <span class="visual-terminal-dot dot-yellow"></span>
+                            <span class="visual-terminal-dot dot-green"></span>
+                            <span class="visual-terminal-title">inventory.json</span>
+                            <span class="visual-terminal-badge">Go</span>
+                        </div>
+                        <div class="visual-terminal-body">
+                            <div class="visual-terminal-command">$ focal-agent inventory --json</div>
+                            <div class="visual-terminal-json">
+                                <div><span class="json-key">hostname</span><span class="json-sep">:</span> <span class="json-string">"workstation-01"</span></div>
+                                <div><span class="json-key">os</span><span class="json-sep">:</span> <span class="json-string">"linux"</span></div>
+                                <div><span class="json-key">services</span><span class="json-sep">:</span> <span class="json-number">24</span></div>
+                                <div><span class="json-key">network</span><span class="json-sep">:</span> <span class="json-brace">{</span></div>
+                                <div class="json-indent"><span class="json-key">ip</span><span class="json-sep">:</span> <span class="json-string">"192.168.1.42"</span></div>
+                                <div><span class="json-brace">}</span></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
