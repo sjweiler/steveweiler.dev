@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A case study of FocalDesk, Steve Weiler's Rust-based Wayland desktop environment.">
+  <title>FocalDesk Case Study | Steve Weiler</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="site-nav" aria-label="Primary">
+      <strong class="brand">Steve Weiler</strong>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="projects.html" class="active">Projects</a></li>
+        <li><a href="resume.html">Resume</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="site-main case-study">
+    <section class="case-study-hero">
+      <div class="case-study-intro">
+        <p class="eyebrow">Project case study</p>
+        <div class="status-line">
+          <span class="status-badge">Alpha · Active development</span>
+          <span>Rust · Wayland · Smithay · OpenGL ES</span>
+        </div>
+        <h1>FocalDesk</h1>
+        <p class="case-study-lede">
+          A custom Wayland desktop environment built to explore what a fast,
+          cohesive, keyboard-friendly Linux desktop can be—without treating the
+          compositor as a monolith.
+        </p>
+        <div class="actions">
+          <a class="button" href="https://github.com/sjweiler/focaldesk">View source on GitHub</a>
+          <a class="button secondary" href="#architecture">Explore the architecture</a>
+        </div>
+      </div>
+
+      <figure class="case-study-hero-media">
+        <img src="assets/focaldesk/desktop.png" alt="FocalDesk desktop with its aerospace-inspired shell, top bar, and side navigation">
+        <figcaption>The FocalDesk compositor and shell running as a complete desktop session.</figcaption>
+      </figure>
+    </section>
+
+    <section class="case-study-summary" aria-label="Project summary">
+      <article class="case-stat">
+        <span class="case-stat-label">Role</span>
+        <strong>Creator and lead developer</strong>
+        <p>Product direction, systems architecture, Rust development, UI, integration, and testing.</p>
+      </article>
+      <article class="case-stat">
+        <span class="case-stat-label">Scope</span>
+        <strong>Full desktop stack</strong>
+        <p>Compositor, shell, display manager, services, native applications, capture, and AI integration.</p>
+      </article>
+      <article class="case-stat">
+        <span class="case-stat-label">Current state</span>
+        <strong>Working alpha</strong>
+        <p>Used daily by its creator, with active development and expected rough edges.</p>
+      </article>
+    </section>
+
+    <section class="case-study-section split-section">
+      <div>
+        <p class="eyebrow">The challenge</p>
+        <h2>Build a desktop, not just a compositor demo.</h2>
+      </div>
+      <div class="prose">
+        <p>
+          A usable Linux desktop has to coordinate rendering, input, windows,
+          workspaces, applications, system controls, capture, and session state.
+          Putting all of that inside one compositor process would make failures
+          harder to isolate and future automation harder to control.
+        </p>
+        <p>
+          FocalDesk keeps the compositor focused on the display and interaction
+          loop while recoverable services handle application launching, power,
+          notifications, dialogs, controls, settings, and AI requests.
+        </p>
+      </div>
+    </section>
+
+    <section class="case-study-section" id="architecture">
+      <div class="section-heading case-heading">
+        <p class="eyebrow">System design</p>
+        <h2>A compositor-centered, service-oriented architecture</h2>
+        <p>
+          Native Wayland and XWayland clients meet at the compositor. Rendering
+          and hardware backends stay close to the frame loop, while typed IPC
+          creates a boundary around supporting desktop services.
+        </p>
+      </div>
+
+      <figure class="architecture-figure card">
+        <img src="assets/focaldesk/architecture-overview.png" alt="Diagram showing FocalDesk user applications, compositor, renderer, IPC layer, desktop services, and hardware backends">
+        <figcaption>
+          High-level project architecture. The AI and permission components
+          marked as future work in this earlier design have since entered alpha
+          implementation.
+        </figcaption>
+      </figure>
+
+      <div class="decision-grid">
+        <article class="card decision-card">
+          <span class="decision-number">01</span>
+          <h3>Keep the frame loop focused</h3>
+          <p>Window management, input, rendering, outputs, and shell behavior remain the compositor's core responsibility.</p>
+        </article>
+        <article class="card decision-card">
+          <span class="decision-number">02</span>
+          <h3>Isolate supporting services</h3>
+          <p>Launch, power, notifications, dialogs, and controls run out of process and communicate through explicit IPC.</p>
+        </article>
+        <article class="card decision-card">
+          <span class="decision-number">03</span>
+          <h3>Gate automated actions</h3>
+          <p>AI requests use visible permission prompts and recorded decisions instead of receiving unrestricted desktop access.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="case-study-section">
+      <div class="section-heading case-heading">
+        <p class="eyebrow">Working system</p>
+        <h2>First-party tools share one desktop language.</h2>
+        <p>
+          The project includes native applications and services that exercise
+          the architecture as a system rather than as isolated prototypes.
+        </p>
+      </div>
+
+      <div class="case-gallery">
+        <figure class="gallery-item gallery-item--wide">
+          <img src="assets/focaldesk/launcher.png" loading="lazy" alt="FocalDesk native application launcher open over the desktop">
+          <figcaption><strong>Launcher</strong><span>Application discovery through a dedicated launch service.</span></figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <img src="assets/focaldesk/settings.png" loading="lazy" alt="FocalDesk settings application">
+          <figcaption><strong>Settings</strong><span>Central configuration for the desktop and system services.</span></figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <img src="assets/focaldesk/files.png" loading="lazy" alt="FocalDesk native file manager">
+          <figcaption><strong>Files</strong><span>A first-party file manager with familiar desktop navigation.</span></figcaption>
+        </figure>
+        <figure class="gallery-item gallery-item--wide">
+          <img src="assets/focaldesk/ai-permission.png" loading="lazy" alt="FocalDesk AI Console showing a native permission request">
+          <figcaption><strong>Permissioned AI</strong><span>Local model access crosses a visible approval boundary.</span></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="case-study-section proof-section">
+      <div class="proof-copy">
+        <p class="eyebrow">Compatibility proof</p>
+        <h2>Tested with real graphics workloads.</h2>
+        <p>
+          Running complex applications through Wine and DXVK validates more than
+          appearance. It exercises XWayland, Vulkan translation, GPU acceleration,
+          input handling, and high-performance rendering in the compositor.
+        </p>
+      </div>
+      <figure class="gallery-item">
+        <img src="assets/focaldesk/wine-dxvk.png" loading="lazy" alt="A 3D game running through Wine and DXVK on FocalDesk">
+        <figcaption><strong>Wine / DXVK</strong><span>A demanding compatibility and rendering test.</span></figcaption>
+      </figure>
+    </section>
+
+    <section class="case-study-section status-section">
+      <div>
+        <p class="eyebrow">Where it stands</p>
+        <h2>Useful today, deliberately labeled alpha.</h2>
+      </div>
+      <div class="status-columns">
+        <div>
+          <h3>Working now</h3>
+          <ul class="feature-list">
+            <li>Native Wayland compositor and desktop shell</li>
+            <li>Display manager, greeter, and session services</li>
+            <li>Launcher, settings, file manager, and AI Console</li>
+            <li>XWayland, Wine/DXVK, and PipeWire capture</li>
+            <li>Typed service boundaries and permission prompts</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Still evolving</h3>
+          <ul class="feature-list">
+            <li>Installation and packaging experience</li>
+            <li>Hardware coverage and compositor stability</li>
+            <li>Feature completeness across native applications</li>
+            <li>Public APIs and IPC contracts</li>
+            <li>Repeatable releases for broader daily use</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="card case-study-links">
+      <div>
+        <p class="eyebrow">Go deeper</p>
+        <h2>Read the engineering documentation.</h2>
+        <p>The repository contains the living build, architecture, IPC, rendering, workspace, and contributor documentation.</p>
+      </div>
+      <div class="doc-links">
+        <a href="https://github.com/sjweiler/focaldesk">Repository <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/sjweiler/focaldesk/blob/main/docs/architecture.md">Architecture <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/sjweiler/focaldesk/blob/main/docs/building.md">Build guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/sjweiler/focaldesk/blob/main/docs/ipc.md">IPC design <span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 Steve Weiler</p>
+  </footer>
+</body>
+</html>
