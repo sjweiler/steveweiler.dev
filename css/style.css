@@ -996,6 +996,93 @@ figure figcaption {
   margin-bottom: 0;
 }
 
+.engineering-section {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.85fr) minmax(0, 1.15fr);
+  gap: 64px;
+  align-items: start;
+}
+
+.engineering-copy h2,
+.evidence-section h2 {
+  margin-bottom: 18px;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.engineering-copy > p:not(.eyebrow) {
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.75;
+}
+
+.tradeoff-list {
+  display: grid;
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--border);
+  box-shadow: var(--shadow);
+}
+
+.tradeoff-item {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.tradeoff-item > span {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--accent-strong);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.tradeoff-item h3 {
+  margin-bottom: 8px;
+}
+
+.tradeoff-item p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.evidence-card {
+  min-width: 0;
+  box-shadow: none;
+}
+
+.evidence-card strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--accent-strong);
+  font-family: ui-serif, Georgia, Cambria, "Times New Roman", serif;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  line-height: 1;
+}
+
+.evidence-card span {
+  color: var(--text);
+  font-weight: 800;
+}
+
+.evidence-card p {
+  margin: 10px 0 0;
+  font-size: 0.9rem;
+}
+
 .case-gallery {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1135,9 +1222,12 @@ figure figcaption {
 
   .case-study-summary,
   .decision-grid,
+  .engineering-section,
+  .evidence-grid,
   .case-gallery,
   .proof-section,
   .split-section,
+  .engineering-section,
   .status-section,
   .status-columns,
   .case-study-links {
