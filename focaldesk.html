@@ -54,13 +54,13 @@
       </article>
       <article class="case-stat">
         <span class="case-stat-label">Scope</span>
-        <strong>Full desktop stack</strong>
-        <p>Compositor, shell, display manager, services, native applications, capture, and AI integration.</p>
+        <strong>45-package Rust workspace</strong>
+        <p>Compositor, shell, display manager, shared crates, services, native applications, capture, and AI experiments.</p>
       </article>
       <article class="case-stat">
         <span class="case-stat-label">Current state</span>
         <strong>Working alpha</strong>
-        <p>Used daily by its creator, with active development and expected rough edges.</p>
+        <p>Developed and used by its creator, with changing APIs, experimental subsystems, and expected rough edges.</p>
       </article>
     </section>
 
@@ -96,11 +96,11 @@
       </div>
 
       <figure class="architecture-figure card">
-        <img src="assets/focaldesk/architecture-overview.png" alt="Diagram showing FocalDesk user applications, compositor, renderer, IPC layer, desktop services, and hardware backends">
+        <img src="assets/focaldesk/architecture-overview-v2.svg" alt="Diagram showing applications entering the FocalDesk compositor, frames moving through the renderer and hardware backends, and typed IPC connecting out-of-process desktop services">
         <figcaption>
-          High-level project architecture. The AI and permission components
-          marked as future work in this earlier design have since entered alpha
-          implementation.
+          Current high-level architecture. Solid paths show implemented system
+          boundaries; dashed outlines identify experimental areas whose behavior
+          and APIs are still changing.
         </figcaption>
       </figure>
 
@@ -123,13 +123,88 @@
       </div>
     </section>
 
+    <section class="case-study-section engineering-section">
+      <div class="engineering-copy">
+        <p class="eyebrow">Engineering deep dive</p>
+        <h2>Keep variable-latency work out of the frame loop.</h2>
+        <p>
+          A compositor cannot treat application launches, power operations,
+          notification handling, hardware controls, or model requests like
+          ordinary in-process UI work. Any one of them can block, fail, or wait
+          for a person—while input and rendering still need to remain responsive.
+        </p>
+        <p>
+          I drew the boundary around what must remain compositor-owned: surfaces,
+          focus, workspaces, input routing, shell state, outputs, and frame
+          coordination. Supporting work moves into recoverable user services and
+          crosses explicit request, response, and event contracts.
+        </p>
+      </div>
+      <div class="tradeoff-list" aria-label="Architecture tradeoffs">
+        <article class="tradeoff-item">
+          <span>Constraint</span>
+          <h3>The desktop must keep drawing when a service is slow.</h3>
+          <p>Long-running work cannot share ownership of the rendering and input loop.</p>
+        </article>
+        <article class="tradeoff-item">
+          <span>Decision</span>
+          <h3>Use typed IPC and separate user services.</h3>
+          <p>Launch, power, notifications, dialogs, controls, settings, and automation can evolve or restart independently.</p>
+        </article>
+        <article class="tradeoff-item">
+          <span>Tradeoff</span>
+          <h3>More process boundaries require more discipline.</h3>
+          <p>Message contracts, failure handling, logging, service discovery, and permissions become explicit engineering work.</p>
+        </article>
+        <article class="tradeoff-item">
+          <span>Result</span>
+          <h3>A smaller critical core with visible safety boundaries.</h3>
+          <p>The architecture isolates recoverable work and gives AI requests a native approval path before an action proceeds.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="case-study-section evidence-section">
+      <div class="section-heading case-heading">
+        <p class="eyebrow">Repository evidence · July 2026</p>
+        <h2>The scope is visible in the source.</h2>
+        <p>
+          These figures come from the public workspace and CI configuration.
+          They describe engineering breadth—not a promise of production maturity.
+        </p>
+      </div>
+      <div class="evidence-grid">
+        <article class="evidence-card">
+          <strong>45</strong>
+          <span>Rust workspace packages</span>
+          <p>Applications, shared libraries, compositor components, and user services.</p>
+        </article>
+        <article class="evidence-card">
+          <strong>164</strong>
+          <span>Rust test cases</span>
+          <p>Test annotations across 44 source files in the current repository snapshot.</p>
+        </article>
+        <article class="evidence-card">
+          <strong>2</strong>
+          <span>Compositor backends</span>
+          <p>Direct DRM/KMS for a real session and nested winit for safer development.</p>
+        </article>
+        <article class="evidence-card">
+          <strong>5</strong>
+          <span>Automated CI gates</span>
+          <p>Formatting, workspace check, Clippy, tests, and documentation-link validation.</p>
+        </article>
+      </div>
+    </section>
+
     <section class="case-study-section">
       <div class="section-heading case-heading">
         <p class="eyebrow">Working system</p>
-        <h2>First-party tools share one desktop language.</h2>
+        <h2>Usable prototypes exercise the complete system.</h2>
         <p>
-          The project includes native applications and services that exercise
-          the architecture as a system rather than as isolated prototypes.
+          First-party applications are deliberately labeled prototypes. Their
+          job is to test the compositor, service boundaries, visual language,
+          and everyday workflows together rather than in isolation.
         </p>
       </div>
 
@@ -140,15 +215,15 @@
         </figure>
         <figure class="gallery-item">
           <img src="assets/focaldesk/settings.png" loading="lazy" alt="FocalDesk settings application">
-          <figcaption><strong>Settings</strong><span>Central configuration for the desktop and system services.</span></figcaption>
+          <figcaption><strong>Settings prototype</strong><span>Appearance, display, input, privacy, power, and service controls; some panels remain incomplete or hardware-dependent.</span></figcaption>
         </figure>
         <figure class="gallery-item">
           <img src="assets/focaldesk/files.png" loading="lazy" alt="FocalDesk native file manager">
-          <figcaption><strong>Files</strong><span>A first-party file manager with familiar desktop navigation.</span></figcaption>
+          <figcaption><strong>Files prototype</strong><span>First-party browsing, search, sorting, and list/grid workflows.</span></figcaption>
         </figure>
         <figure class="gallery-item gallery-item--wide">
           <img src="assets/focaldesk/ai-permission.png" loading="lazy" alt="FocalDesk AI Console showing a native permission request">
-          <figcaption><strong>Permissioned AI</strong><span>Local model access crosses a visible approval boundary.</span></figcaption>
+          <figcaption><strong>Experimental AI</strong><span>A model request stops at a visible native permission boundary before proceeding.</span></figcaption>
         </figure>
       </div>
     </section>
@@ -158,9 +233,10 @@
         <p class="eyebrow">Compatibility proof</p>
         <h2>Tested with real graphics workloads.</h2>
         <p>
-          Running complex applications through Wine and DXVK validates more than
-          appearance. It exercises XWayland, Vulkan translation, GPU acceleration,
-          input handling, and high-performance rendering in the compositor.
+          A known-working World of Warcraft setup through Wine and DXVK validates
+          more than appearance. It exercises XWayland, Vulkan translation, GPU
+          acceleration, input handling, and high-performance rendering without
+          implying compatibility with every game, driver, or Wine version.
         </p>
       </div>
       <figure class="gallery-item">
@@ -176,23 +252,23 @@
       </div>
       <div class="status-columns">
         <div>
-          <h3>Working now</h3>
+          <h3>Working alpha</h3>
           <ul class="feature-list">
             <li>Native Wayland compositor and desktop shell</li>
-            <li>Display manager, greeter, and session services</li>
-            <li>Launcher, settings, file manager, and AI Console</li>
-            <li>XWayland, Wine/DXVK, and PipeWire capture</li>
-            <li>Typed service boundaries and permission prompts</li>
+            <li>Direct DRM/KMS and nested winit backends</li>
+            <li>Workspaces and multi-monitor layout</li>
+            <li>XWayland application support</li>
+            <li>Typed service boundaries and native permission prompts</li>
           </ul>
         </div>
         <div>
-          <h3>Still evolving</h3>
+          <h3>Experimental or evolving</h3>
           <ul class="feature-list">
             <li>Installation and packaging experience</li>
-            <li>Hardware coverage and compositor stability</li>
-            <li>Feature completeness across native applications</li>
-            <li>Public APIs and IPC contracts</li>
-            <li>Repeatable releases for broader daily use</li>
+            <li>PipeWire capture, HDR, and color management</li>
+            <li>Settings, Files, Launcher, and AI Console prototypes</li>
+            <li>Local AI and permission-gated automation</li>
+            <li>Precise Wayland subsurface damage tracking</li>
           </ul>
         </div>
       </div>

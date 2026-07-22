@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 940" role="img" aria-labelledby="title description">
+  <title id="title">FocalDesk architecture</title>
+  <desc id="description">Applications connect to the compositor. Frames travel through OpenGL ES rendering to DRM KMS or a nested winit backend. Typed IPC connects the compositor to recoverable desktop services, including experimental AI and automation services.</desc>
+  <defs>
+    <linearGradient id="page" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f8fafc"/>
+      <stop offset="1" stop-color="#eef2f7"/>
+    </linearGradient>
+    <linearGradient id="core" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eff6ff"/>
+      <stop offset="1" stop-color="#ecfeff"/>
+    </linearGradient>
+    <linearGradient id="frame" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f5f3ff"/>
+      <stop offset="1" stop-color="#faf5ff"/>
+    </linearGradient>
+    <linearGradient id="service" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff7ed"/>
+      <stop offset="1" stop-color="#fffbeb"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="7" stdDeviation="10" flood-color="#0f172a" flood-opacity=".10"/>
+    </filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0 0l10 5-10 5z" fill="#334155"/>
+    </marker>
+    <style>
+      .title{font:700 42px ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;fill:#0f172a;letter-spacing:-1px}
+      .subtitle{font:500 18px ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;fill:#64748b}
+      .group{font:700 23px ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;fill:#0f172a}
+      .label{font:650 17px ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;fill:#1e293b}
+      .small{font:500 15px ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;fill:#475569}
+      .tiny{font:700 13px ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.8px;text-transform:uppercase}
+      .flow{fill:none;stroke:#334155;stroke-width:3;marker-end:url(#arrow)}
+      .divider{stroke:#cbd5e1;stroke-width:1}
+      .dot-blue{fill:#2563eb}.dot-violet{fill:#7c3aed}.dot-orange{fill:#ea580c}.dot-green{fill:#15803d}.dot-gold{fill:#b45309}
+    </style>
+  </defs>
+
+  <rect width="1440" height="940" rx="28" fill="url(#page)"/>
+
+  <text x="720" y="60" text-anchor="middle" class="title">FocalDesk Architecture</text>
+  <text x="720" y="91" text-anchor="middle" class="subtitle">A small compositor core, explicit frame path, and recoverable desktop services</text>
+
+  <g transform="translate(92 120)" filter="url(#shadow)">
+    <rect width="1256" height="108" rx="18" fill="#fff" stroke="#93c5fd" stroke-width="2"/>
+    <text x="28" y="34" class="tiny" fill="#1d4ed8">Application surfaces</text>
+    <g transform="translate(28 52)">
+      <rect width="250" height="38" rx="10" fill="#eff6ff"/><circle cx="20" cy="19" r="6" class="dot-blue"/><text x="36" y="25" class="label">Native Wayland</text>
+      <rect x="272" width="286" height="38" rx="10" fill="#eff6ff"/><circle cx="292" cy="19" r="6" class="dot-blue"/><text x="308" y="25" class="label">XWayland + Wine/DXVK</text>
+      <rect x="580" width="300" height="38" rx="10" fill="#eff6ff"/><circle cx="600" cy="19" r="6" class="dot-blue"/><text x="616" y="25" class="label">GTK applications</text>
+      <rect x="902" width="298" height="38" rx="10" fill="#eff6ff"/><circle cx="922" cy="19" r="6" class="dot-blue"/><text x="938" y="25" class="label">Browsers, terminals, games</text>
+    </g>
+  </g>
+
+  <path class="flow" d="M720 228v42"/>
+
+  <g transform="translate(250 274)" filter="url(#shadow)">
+    <rect width="940" height="190" rx="20" fill="url(#core)" stroke="#2563eb" stroke-width="2.5"/>
+    <text x="28" y="38" class="tiny" fill="#1d4ed8">Latency-critical core</text>
+    <text x="28" y="75" class="group">FocalDesk compositor + shell</text>
+    <line x1="28" y1="94" x2="912" y2="94" class="divider"/>
+    <circle cx="42" cy="123" r="6" class="dot-blue"/><text x="59" y="130" class="label">Surfaces + focus</text>
+    <circle cx="264" cy="123" r="6" class="dot-blue"/><text x="281" y="130" class="label">Input routing</text>
+    <circle cx="485" cy="123" r="6" class="dot-blue"/><text x="502" y="130" class="label">Workspaces</text>
+    <circle cx="704" cy="123" r="6" class="dot-blue"/><text x="721" y="130" class="label">Output state</text>
+    <circle cx="42" cy="159" r="6" class="dot-blue"/><text x="59" y="166" class="label">Shell + scene</text>
+    <circle cx="264" cy="159" r="6" class="dot-blue"/><text x="281" y="166" class="label">Damage tracking</text>
+    <circle cx="485" cy="159" r="6" class="dot-blue"/><text x="502" y="166" class="label">Frame coordination</text>
+    <circle cx="704" cy="159" r="6" class="dot-blue"/><text x="721" y="166" class="label">Permission UI</text>
+  </g>
+
+  <path class="flow" d="M490 464v55"/>
+  <text x="424" y="499" class="tiny" fill="#6d28d9">Frame path</text>
+  <path class="flow" d="M950 464v55"/>
+  <text x="969" y="499" class="tiny" fill="#c2410c">Messages + events</text>
+
+  <g transform="translate(92 524)" filter="url(#shadow)">
+    <rect width="612" height="246" rx="20" fill="url(#frame)" stroke="#7c3aed" stroke-width="2.5"/>
+    <text x="28" y="38" class="tiny" fill="#6d28d9">Rendering + presentation</text>
+    <text x="28" y="75" class="group">OpenGL ES renderer</text>
+    <text x="28" y="105" class="small">Scene composition · effects · cursors · color pipeline</text>
+    <line x1="28" y1="126" x2="584" y2="126" class="divider"/>
+    <rect x="28" y="145" width="260" height="70" rx="14" fill="#fff" stroke="#c4b5fd"/>
+    <circle cx="50" cy="170" r="6" class="dot-violet"/><text x="67" y="176" class="label">DRM/KMS backend</text>
+    <text x="50" y="200" class="small">Direct hardware session</text>
+    <rect x="316" y="145" width="268" height="70" rx="14" fill="#fff" stroke="#c4b5fd"/>
+    <circle cx="338" cy="170" r="6" class="dot-violet"/><text x="355" y="176" class="label">Nested winit backend</text>
+    <text x="338" y="200" class="small">Safer development path</text>
+  </g>
+
+  <g transform="translate(736 524)" filter="url(#shadow)">
+    <rect width="612" height="246" rx="20" fill="url(#service)" stroke="#ea580c" stroke-width="2.5"/>
+    <text x="28" y="38" class="tiny" fill="#c2410c">Typed IPC boundary</text>
+    <text x="28" y="75" class="group">Out-of-process user services</text>
+    <text x="28" y="105" class="small">Explicit requests, responses, events, failures, and logs</text>
+    <line x1="28" y1="126" x2="584" y2="126" class="divider"/>
+    <circle cx="42" cy="157" r="6" class="dot-orange"/><text x="59" y="163" class="label">launchd</text>
+    <circle cx="194" cy="157" r="6" class="dot-orange"/><text x="211" y="163" class="label">powerd</text>
+    <circle cx="346" cy="157" r="6" class="dot-orange"/><text x="363" y="163" class="label">notificationsd</text>
+    <circle cx="42" cy="195" r="6" class="dot-orange"/><text x="59" y="201" class="label">dialogd</text>
+    <circle cx="194" cy="195" r="6" class="dot-orange"/><text x="211" y="201" class="label">controlsd</text>
+    <circle cx="346" cy="195" r="6" class="dot-orange"/><text x="363" y="201" class="label">settings + apps</text>
+  </g>
+
+  <path class="flow" d="M398 770v53"/>
+  <path class="flow" d="M1042 770v53"/>
+
+  <g transform="translate(92 828)">
+    <rect width="612" height="74" rx="17" fill="#fff" stroke="#94a3b8" stroke-width="2"/>
+    <text x="28" y="30" class="tiny" fill="#475569">Outputs + interfaces</text>
+    <text x="28" y="57" class="label">Displays · multi-monitor · PipeWire capture</text>
+    <rect x="438" y="17" width="146" height="39" rx="20" fill="#fff7ed" stroke="#f59e0b" stroke-width="2" stroke-dasharray="7 6"/>
+    <text x="511" y="42" text-anchor="middle" class="tiny" fill="#b45309">Capture experimental</text>
+  </g>
+
+  <g transform="translate(736 814)">
+    <rect width="612" height="88" rx="17" fill="#fff" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="9 7"/>
+    <text x="28" y="32" class="tiny" fill="#b45309">Experimental, permission-gated</text>
+    <text x="28" y="62" class="label">Local AI · automation · voice services</text>
+    <rect x="450" y="20" width="134" height="44" rx="22" fill="#fffbeb" stroke="#f59e0b"/>
+    <text x="517" y="47" text-anchor="middle" class="tiny" fill="#b45309">Prompt first</text>
+  </g>
+
+  <g transform="translate(1076 28)">
+    <circle cx="0" cy="0" r="6" class="dot-green"/><text x="14" y="5" class="small">Current path</text>
+    <rect x="131" y="-7" width="23" height="14" rx="5" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5 4"/>
+    <text x="164" y="5" class="small">Experimental</text>
+  </g>
+</svg>
