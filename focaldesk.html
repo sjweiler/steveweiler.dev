@@ -123,6 +123,96 @@
       </div>
     </section>
 
+    <section class="case-study-section" id="foundations">
+      <div class="section-heading case-heading">
+        <p class="eyebrow">Engineering decisions</p>
+        <h2>Choose foundations by fit, not fashion.</h2>
+        <p>
+          Each major technology choice started with the failure modes, ownership
+          boundaries, and maintenance burden of a complete desktop session—not
+          with a preference for the newest or most powerful tool.
+        </p>
+      </div>
+
+      <div class="foundation-grid">
+        <article class="card foundation-card">
+          <span class="decision-number">01 · Compositor framework</span>
+          <h3>Smithay over wlroots</h3>
+          <dl class="decision-rationale">
+            <div>
+              <dt>Constraint</dt>
+              <dd>Keep direct ownership of a Rust-native compositor, rendering path, IPC model, session, and desktop services.</dd>
+            </div>
+            <div>
+              <dt>Decision</dt>
+              <dd>Use Smithay's reusable Wayland building blocks without adopting a prescribed shell or adding a C integration layer.</dd>
+            </div>
+            <div>
+              <dt>Tradeoff</dt>
+              <dd>More of the product architecture remains FocalDesk's responsibility, but its boundaries can evolve as one coherent Rust system.</dd>
+            </div>
+          </dl>
+        </article>
+
+        <article class="card foundation-card">
+          <span class="decision-number">02 · Systems language</span>
+          <h3>Rust for the session-critical core</h3>
+          <dl class="decision-rationale">
+            <div>
+              <dt>Constraint</dt>
+              <dd>A compositor coordinates graphics buffers, hardware, input, IPC, and asynchronous services; a fault can take down the session.</dd>
+            </div>
+            <div>
+              <dt>Decision</dt>
+              <dd>Use compile-time ownership and concurrency checks to prevent common memory and shared-state failures while retaining low-level control.</dd>
+            </div>
+            <div>
+              <dt>Tradeoff</dt>
+              <dd>Stricter implementation constraints and longer compile cycles buy stronger invariants in code that must remain responsive.</dd>
+            </div>
+          </dl>
+        </article>
+
+        <article class="card foundation-card">
+          <span class="decision-number">03 · Renderer</span>
+          <h3>OpenGL ES instead of Vulkan</h3>
+          <dl class="decision-rationale">
+            <div>
+              <dt>Constraint</dt>
+              <dd>The workload is desktop composition: window textures, shell elements, shaders, transparency, geometry, and DRM/KMS presentation.</dd>
+            </div>
+            <div>
+              <dt>Decision</dt>
+              <dd>Use OpenGL ES, which provides the needed rendering capabilities without Vulkan's explicit resource and synchronization complexity.</dd>
+            </div>
+            <div>
+              <dt>Tradeoff</dt>
+              <dd>Give up some low-level control that the current workload does not need in exchange for a smaller, more maintainable rendering surface.</dd>
+            </div>
+          </dl>
+        </article>
+
+        <article class="card foundation-card">
+          <span class="decision-number">04 · Session lifecycle</span>
+          <h3>A dedicated session manager</h3>
+          <dl class="decision-rationale">
+            <div>
+              <dt>Constraint</dt>
+              <dd>Desktop services must start in a predictable order, be supervised independently, and terminate cleanly at logout.</dd>
+            </div>
+            <div>
+              <dt>Decision</dt>
+              <dd>Own the session lifecycle between the display manager, compositor, and supporting user services.</dd>
+            </div>
+            <div>
+              <dt>Tradeoff</dt>
+              <dd>FocalDesk must implement startup, shutdown, state tracking, and failure handling instead of inheriting another desktop's behavior.</dd>
+            </div>
+          </dl>
+        </article>
+      </div>
+    </section>
+
     <section class="case-study-section engineering-section">
       <div class="engineering-copy">
         <p class="eyebrow">Engineering deep dive</p>
@@ -282,6 +372,7 @@
       </div>
       <div class="doc-links">
         <a href="https://github.com/sjweiler/focaldesk">Repository <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/sjweiler/focaldesk/blob/main/docs/engineering.md">Engineering decisions <span aria-hidden="true">↗</span></a>
         <a href="https://github.com/sjweiler/focaldesk/blob/main/docs/architecture.md">Architecture <span aria-hidden="true">↗</span></a>
         <a href="https://github.com/sjweiler/focaldesk/blob/main/docs/building.md">Build guide <span aria-hidden="true">↗</span></a>
         <a href="https://github.com/sjweiler/focaldesk/blob/main/docs/ipc.md">IPC design <span aria-hidden="true">↗</span></a>
