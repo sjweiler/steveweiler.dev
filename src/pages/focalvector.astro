@@ -1,0 +1,318 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="FocalVector Case Study | Steve Weiler"
+  description="A case study of FocalVector, Steve Weiler's durable Rust vector database with exact and HNSW search, metadata filtering, sharding, and OpenRaft replication."
+>
+  <main class="site-main case-study">
+    <section class="case-study-hero">
+      <div class="case-study-intro">
+        <p class="eyebrow">Project case study</p>
+        <div class="status-line">
+          <span class="status-badge">Beta · Active development</span>
+          <span>Rust · HNSW · OpenRaft · Axum · CRC32C</span>
+        </div>
+        <h1>FocalVector</h1>
+        <p class="case-study-lede">
+          A low-latency vector database that treats search quality, crash
+          recovery, and operational boundaries as one system—from an exact
+          correctness engine to persisted HNSW indexes and replicated shards.
+        </p>
+        <div class="actions">
+          <a class="button" href="https://github.com/sjweiler/focal-vector">View source on GitHub</a>
+          <a class="button secondary" href="#architecture">Explore the architecture</a>
+        </div>
+      </div>
+
+      <figure class="case-study-hero-media vector-case-figure">
+        <div
+          class="project-visual project-visual--vector vector-case-visual"
+          role="img"
+          aria-label="FocalVector architecture showing clients entering through HTTP or local IPC; a collection router splitting query and write paths; HNSW and metadata indexes serving queries; and WAL, memtable, and immutable segments providing durable storage"
+        >
+          <div class="vector-architecture">
+            <div class="vector-flow">
+              <span class="vector-node vector-node--client">Client</span>
+              <span class="vector-connector">HTTP / local IPC</span>
+              <span class="vector-node vector-node--router">Collection router</span>
+              <div class="vector-branches">
+                <div>
+                  <span class="vector-node">Query executor</span>
+                  <span class="vector-detail">Exact + HNSW + metadata</span>
+                </div>
+                <div>
+                  <span class="vector-node">Write coordinator</span>
+                  <span class="vector-detail">CRC32C WAL + memtable</span>
+                </div>
+              </div>
+            </div>
+            <div class="vector-database" aria-hidden="true">
+              <svg viewBox="0 0 88 112">
+                <ellipse cx="44" cy="20" rx="32" ry="12"></ellipse>
+                <path d="M12 20v24c0 6.6 14.3 12 32 12s32-5.4 32-12V20"></path>
+                <path d="M12 44v24c0 6.6 14.3 12 32 12s32-5.4 32-12V44"></path>
+                <path d="M12 68v24c0 6.6 14.3 12 32 12s32-5.4 32-12V68"></path>
+              </svg>
+              <strong>Immutable segments</strong>
+            </div>
+          </div>
+        </div>
+        <figcaption>
+          The implemented engine separates request routing, query execution,
+          durable writes, and immutable search structures.
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="case-study-summary" aria-label="Project summary">
+      <article class="case-stat">
+        <span class="case-stat-label">Role</span>
+        <strong>Creator and lead developer</strong>
+        <p>Storage design, Rust implementation, indexing, distributed systems, APIs, benchmarks, and failure testing.</p>
+      </article>
+      <article class="case-stat">
+        <span class="case-stat-label">Scope</span>
+        <strong>Storage engine to replicated service</strong>
+        <p>Exact and approximate search, typed filters, WAL recovery, immutable segments, backups, sharding, and Raft replication.</p>
+      </article>
+      <article class="case-stat">
+        <span class="case-stat-label">Current state</span>
+        <strong>Dogfooding and beta use</strong>
+        <p>Designed first as FocalDesk's local semantic-search sidecar, with distributed operation available for further hardening.</p>
+      </article>
+    </section>
+
+    <section class="case-study-section split-section">
+      <div>
+        <p class="eyebrow">The challenge</p>
+        <h2>Make approximate search fast without making durability approximate.</h2>
+      </div>
+      <div class="prose">
+        <p>
+          Vector search systems have competing responsibilities. Queries need
+          low latency and useful recall, writes need a clear acknowledgement
+          boundary, filters must not silently discard valid neighbors, and a
+          restart must recover the same committed state.
+        </p>
+        <p>
+          FocalVector starts with an exact-search correctness engine, then layers
+          deterministic HNSW, full-precision reranking, indexed metadata,
+          checksummed persistence, and replication around that reference path.
+          Optimizations are measured against correctness instead of replacing it.
+        </p>
+      </div>
+    </section>
+
+    <section class="case-study-section" id="architecture">
+      <div class="section-heading case-heading">
+        <p class="eyebrow">System design</p>
+        <h2>An LSM-like engine with explicit read and write paths.</h2>
+        <p>
+          The write coordinator validates a complete mutation batch, appends a
+          checksummed WAL frame, synchronizes according to the selected durability
+          mode, and only then publishes the mutation to memory. Queries merge
+          immutable graph segments with an exact delta of newer changes.
+        </p>
+      </div>
+
+      <div class="decision-grid">
+        <article class="card decision-card">
+          <span class="decision-number">01 · Correctness</span>
+          <h3>Keep exact search as the oracle</h3>
+          <p>Exact top-k validates ANN recall, handles selective filters, and remains the best plan for small candidate sets.</p>
+        </article>
+        <article class="card decision-card">
+          <span class="decision-number">02 · Query speed</span>
+          <h3>Persist deterministic HNSW</h3>
+          <p>Graph construction uses stable ordering and tie-breaking, while per-query <code>ef_search</code> exposes the recall and latency tradeoff.</p>
+        </article>
+        <article class="card decision-card">
+          <span class="decision-number">03 · Durability</span>
+          <h3>Publish immutable state atomically</h3>
+          <p>CRC32C-protected WAL and segment files fail closed on corruption, and manifests change only after replacement data is durable.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="case-study-section" id="foundations">
+      <div class="section-heading case-heading">
+        <p class="eyebrow">Engineering decisions</p>
+        <h2>Own the invariants that determine search quality and recovery.</h2>
+        <p>
+          FocalVector owns its graph representation, storage formats, visibility
+          rules, and merge semantics so upgrades and optimizations cannot quietly
+          weaken the external contract.
+        </p>
+      </div>
+
+      <div class="foundation-grid">
+        <article class="card foundation-card">
+          <span class="decision-number">01 · Mutable data</span>
+          <h3>WAL before memtable</h3>
+          <dl class="decision-rationale">
+            <div><dt>Constraint</dt><dd>An acknowledged mutation must survive a process restart or power loss under synchronous durability.</dd></div>
+            <div><dt>Decision</dt><dd>Frame complete batches with CRC32C, append them to the WAL, call <code>sync_data</code>, then apply them atomically in memory.</dd></div>
+            <div><dt>Tradeoff</dt><dd>Durability adds I/O latency, but the acknowledgement boundary is explicit and a torn final frame can be safely discarded.</dd></div>
+          </dl>
+        </article>
+
+        <article class="card foundation-card">
+          <span class="decision-number">02 · Approximate search</span>
+          <h3>Quantized traversal, precise results</h3>
+          <dl class="decision-rationale">
+            <div><dt>Constraint</dt><dd>Large full-precision graph arenas increase memory use, rebuild cost, and query latency.</dd></div>
+            <div><dt>Decision</dt><dd>Traverse scalar-int8 HNSW, oversample candidates, and rerank against authoritative full-precision vectors.</dd></div>
+            <div><dt>Tradeoff</dt><dd>Quantization can change graph traversal recall, so both representations remain benchmarkable and returned scores stay full precision.</dd></div>
+          </dl>
+        </article>
+
+        <article class="card foundation-card">
+          <span class="decision-number">03 · Filtered search</span>
+          <h3>Plan from metadata selectivity</h3>
+          <dl class="decision-rationale">
+            <div><dt>Constraint</dt><dd>Post-filtering a small ANN result set can return too few neighbors even when qualifying points exist.</dd></div>
+            <div><dt>Decision</dt><dd>Use equality and numeric-range indexes to estimate candidates and choose exact, filtered HNSW, or expanded traversal.</dd></div>
+            <div><dt>Tradeoff</dt><dd>The planner is more involved than blind post-filtering, but filtered results preserve the top-k contract.</dd></div>
+          </dl>
+        </article>
+
+        <article class="card foundation-card">
+          <span class="decision-number">04 · Scale-out</span>
+          <h3>Separate sharding from replication</h3>
+          <dl class="decision-rationale">
+            <div><dt>Constraint</dt><dd>Partitioning data and surviving node failure are different problems with different consistency costs.</dd></div>
+            <div><dt>Decision</dt><dd>Use stable FNV-1a sharding, then replicate each shard as its own OpenRaft group with majority-committed writes.</dd></div>
+            <div><dt>Tradeoff</dt><dd>Cross-shard writes are idempotent batches, not transactions, and distributed operation requires deployment-specific failure testing.</dd></div>
+          </dl>
+        </article>
+      </div>
+    </section>
+
+    <section class="case-study-section engineering-section">
+      <div class="engineering-copy">
+        <p class="eyebrow">Engineering deep dive</p>
+        <h2>Incremental persistence keeps fresh writes searchable.</h2>
+        <p>
+          Committed mutations remain in a small exact-search delta and merge with
+          candidates from immutable HNSW segments. Writes therefore do not disable
+          the graph, and routine flushes only rebuild changed live IDs.
+        </p>
+        <p>
+          Search fans out across a bounded number of immutable segments, suppresses
+          stale versions and tombstones against the authoritative snapshot, and
+          compacts after the segment limit. Replacement files are retired only
+          after their manifest is durable.
+        </p>
+      </div>
+      <div class="tradeoff-list" aria-label="Persistence workflow">
+        <article class="tradeoff-item">
+          <span>Commit</span>
+          <h3>Synchronize one validated WAL batch.</h3>
+          <p>Sequence allocation and atomic batch framing make replay and read-your-writes behavior explicit.</p>
+        </article>
+        <article class="tradeoff-item">
+          <span>Query</span>
+          <h3>Merge stable graphs with the exact delta.</h3>
+          <p>Recent inserts, updates, and deletes stay visible before the next graph publication.</p>
+        </article>
+        <article class="tradeoff-item">
+          <span>Flush</span>
+          <h3>Write checksummed immutable segments off-lock.</h3>
+          <p>A short publication lock swaps the manifest only if the collection sequence is still current.</p>
+        </article>
+        <article class="tradeoff-item">
+          <span>Recover</span>
+          <h3>Map validated files and replay the remaining WAL.</h3>
+          <p>Search and reranking score vectors directly from read-only mappings instead of copying the full collection to heap arenas.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="case-study-section evidence-section">
+      <div class="section-heading case-heading">
+        <p class="eyebrow">Repository evidence · August 2026</p>
+        <h2>Benchmarks report the tradeoffs, not just the fastest number.</h2>
+        <p>
+          These repository measurements are regression evidence from a specific
+          development host and synthetic corpora. Production embeddings still
+          require their own recall, latency, concurrency, and cold-cache tests.
+        </p>
+      </div>
+      <div class="evidence-grid">
+        <article class="evidence-card">
+          <strong>77</strong>
+          <span>Passing tests</span>
+          <p>Coverage includes search, persistence, corruption handling, sharding, replication, failover, TLS, and local IPC.</p>
+        </article>
+        <article class="evidence-card">
+          <strong>0.316 ms</strong>
+          <span>Mean direct-HNSW query</span>
+          <p>Scalar-int8, 100k × 128 corpus at <code>ef=384</code>, with 95.1% recall@10 before durable API reranking.</p>
+        </article>
+        <article class="evidence-card">
+          <strong>3.8×</strong>
+          <span>Smaller vector arena</span>
+          <p>13.6 MB scalar-int8 versus 51.2 MB <code>f32</code> for the same 100k × 128 benchmark corpus.</p>
+        </article>
+        <article class="evidence-card">
+          <strong>0.83 MB</strong>
+          <span>Changed-ID delta segment</span>
+          <p>Updating 1,000 points in a 100k × 128 corpus versus an 83.6 MB full segment in the documented run.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="case-study-section status-section">
+      <div>
+        <p class="eyebrow">Where it stands</p>
+        <h2>Useful as a local sidecar, candid about distributed limits.</h2>
+        <p>
+          The intended first deployment is a private FocalDesk user service over
+          a permission-restricted Unix socket. Text and relational metadata remain
+          authoritative elsewhere; vectors are durable but rebuildable search data.
+        </p>
+      </div>
+      <div class="status-columns">
+        <div>
+          <h3>Implemented</h3>
+          <ul class="feature-list">
+            <li>Cosine, dot-product, and Euclidean search</li>
+            <li>Exact and persisted HNSW query paths</li>
+            <li>Metadata equality and numeric-range indexes</li>
+            <li>Checksummed WAL, snapshots, backup, and restore</li>
+            <li>Static sharding and deterministic global top-k</li>
+            <li>OpenRaft replication, snapshots, membership changes, and failover</li>
+            <li>HTTP, TLS/mTLS, metrics, and private local IPC</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Operational hardening</h3>
+          <ul class="feature-list">
+            <li>Long-running mixed read/write soak tests</li>
+            <li>Disk-full and real power-loss fault injection</li>
+            <li>Multi-million-vector cold-cache benchmarks</li>
+            <li>Deployment-specific partition and restore exercises</li>
+            <li>Byte-aware compaction policies and further memory reduction</li>
+            <li>No claim of validated 100-million-vector operation yet</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="card case-study-links">
+      <div>
+        <p class="eyebrow">Go deeper</p>
+        <h2>Read the storage and distributed-system documentation.</h2>
+        <p>The repository documents the implemented system, benchmark methodology, durability contract, architecture, and remaining operational work.</p>
+      </div>
+      <div class="doc-links">
+        <a href="https://github.com/sjweiler/focal-vector">Repository <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/sjweiler/focal-vector/blob/main/README.md">Implementation and benchmarks <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/sjweiler/focal-vector/blob/main/DESIGN.md">Storage-engine design <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/sjweiler/focal-vector/blob/main/DISTRIBUTED.md">Distributed execution contract <span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+  </main>
+</BaseLayout>

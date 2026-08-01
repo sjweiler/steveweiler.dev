@@ -951,7 +951,7 @@ footer p,
   color: var(--text);
 }
 
-/* FocalDesk case study */
+/* Project case studies */
 .case-study {
   max-width: 1180px;
 }
@@ -1021,6 +1021,62 @@ figure figcaption {
 
 .case-study-hero-media > figcaption {
   padding: 12px 4px 0;
+}
+
+.vector-case-figure {
+  border: 1px solid rgba(94, 234, 212, 0.2);
+  border-radius: 24px;
+  background: rgba(7, 17, 29, 0.72);
+  box-shadow: 0 30px 70px rgba(2, 6, 23, 0.62);
+}
+
+.vector-case-visual {
+  min-height: 380px;
+  border: 0;
+  border-bottom: 1px solid rgba(94, 234, 212, 0.18);
+  border-radius: 24px 24px 0 0;
+}
+
+.vector-case-visual .vector-architecture {
+  inset: clamp(24px, 5vw, 54px);
+  grid-template-columns: minmax(0, 1fr) minmax(130px, 0.32fr);
+  gap: clamp(24px, 5vw, 64px);
+}
+
+.vector-case-visual .vector-flow {
+  gap: 12px;
+}
+
+.vector-case-visual .vector-node {
+  padding: 11px 14px;
+  font-size: clamp(0.7rem, 1.5vw, 0.9rem);
+}
+
+.vector-case-visual .vector-connector,
+.vector-case-visual .vector-detail {
+  font-size: clamp(0.65rem, 1.3vw, 0.82rem);
+}
+
+.vector-case-visual .vector-branches {
+  gap: 14px;
+  padding-top: 14px;
+}
+
+.vector-case-visual .vector-branches::before {
+  inset-block-start: -9px;
+  font-size: 1rem;
+}
+
+.vector-case-visual .vector-database svg {
+  width: min(120px, 100%);
+}
+
+.vector-case-visual .vector-database strong {
+  text-align: center;
+}
+
+.vector-case-figure > figcaption {
+  padding: 14px 18px 18px;
 }
 
 .case-study-summary {
@@ -1428,6 +1484,14 @@ figure figcaption {
 
   .case-gallery .gallery-item--wide {
     grid-column: auto;
+  }
+
+  .vector-case-visual {
+    min-height: 500px;
+  }
+
+  .vector-case-visual .vector-architecture {
+    grid-template-columns: 1fr;
   }
 
   .proof-section,

@@ -139,20 +139,21 @@ import BaseLayout from "../layouts/BaseLayout.astro";
             <div class="project-header">
                 <div class="project-badge">FV</div>
                 <div>
-                    <h2>FocalVector</h2>
+                    <h2><a class="project-title-link" href="/focalvector/">FocalVector</a></h2>
                     <p class="project-kicker">Low-latency vector database</p>
                 </div>
             </div>
 
-            <div
-                class="project-visual project-visual--vector"
+            <a
+                class="project-visual project-visual--vector project-visual-link"
+                href="/focalvector/"
                 role="img"
-                aria-label="FocalVector architecture: clients connect over HTTP or gRPC to a collection router, which branches to query execution over HNSW and metadata indexes and coordinated writes through a write-ahead log and memtable into durable vector storage"
+                aria-label="Read the FocalVector case study"
             >
                 <div class="vector-architecture">
                     <div class="vector-flow">
                         <span class="vector-node vector-node--client">Client</span>
-                        <span class="vector-connector">HTTP / gRPC</span>
+                        <span class="vector-connector">HTTP / local IPC</span>
                         <span class="vector-node vector-node--router">Collection router</span>
                         <div class="vector-branches">
                             <div>
@@ -176,7 +177,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
                         <strong>Vectors</strong>
                     </div>
                 </div>
-            </div>
+            </a>
 
             <p>
                 Durable Rust vector database with exact and HNSW search, metadata
@@ -185,7 +186,10 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
             <p><strong>Technologies:</strong> Rust, HNSW, OpenRaft, CRC32C</p>
 
-            <a class="button" href="https://github.com/sjweiler/focal-vector">GitHub</a>
+            <div class="actions">
+                <a class="button" href="/focalvector/">Read case study</a>
+                <a class="button secondary" href="https://github.com/sjweiler/focal-vector">GitHub</a>
+            </div>
         </article>
 
         <article class="card project-card">
