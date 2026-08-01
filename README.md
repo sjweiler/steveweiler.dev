@@ -17,3 +17,10 @@ npm run preview
 ```
 
 Astro writes the static site to `dist/`.
+
+## Deployment
+
+The site is deployed by Cloudflare Pages from the `main` branch using:
+
+- Build command: `npm run build`
+- Build output directory: `dist`
