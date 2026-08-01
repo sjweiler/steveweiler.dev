@@ -50,12 +50,12 @@ import BaseLayout from "../layouts/BaseLayout.astro";
             <div class="project-header">
                 <div class="project-badge">FA</div>
                 <div>
-                    <h2>Focal Agent</h2>
-                    <p class="project-kicker">AI desktop assistant</p>
+                    <h2><a class="project-title-link" href="/focal-agent/">Focal Agent</a></h2>
+                    <p class="project-kicker">Local-first Windows AI assistant</p>
                 </div>
             </div>
 
-            <div class="project-visual project-visual--focal-agent" aria-hidden="true">
+            <a class="project-visual project-visual--focal-agent project-visual-link" href="/focal-agent/" aria-label="Read the Focal Agent case study">
                 <div class="visual-assistant">
                     <div class="visual-assistant-shell">
                         <div class="visual-assistant-top">
@@ -69,26 +69,29 @@ import BaseLayout from "../layouts/BaseLayout.astro";
                             <div class="visual-assistant-chips">
                                 <span>Desktop</span>
                                 <span>Voice</span>
-                                <span>Automation</span>
+                                <span>Plugins</span>
                             </div>
                             <div class="visual-assistant-thread">
-                                <div class="assistant-message assistant-message--user">Capture this screen and draft the follow-up.</div>
-                                <div class="assistant-message assistant-message--agent">Opening capture tool, generating summary, queueing tasks.</div>
-                                <div class="assistant-message assistant-message--result">Completed · 3 actions · 2 plugins</div>
+                                <div class="assistant-message assistant-message--user">What is running on this PC?</div>
+                                <div class="assistant-message assistant-message--agent">The Inventory plugin needs permission to inspect processes.</div>
+                                <div class="assistant-message assistant-message--result">Permission required · Review request</div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
 
             <p>
-                AI desktop assistant supporting local and cloud language models,
-                plugins, voice interaction, and system automation.
+                Windows desktop assistant with local Ollama chat, offline Vosk voice
+                input, and permission-gated external plugins.
             </p>
 
-            <p><strong>Technologies:</strong> C#, .NET, Ollama, AI</p>
+            <p><strong>Technologies:</strong> C#, .NET 10, WinForms, Ollama, Vosk</p>
 
-            <a class="button" href="https://github.com/sjweiler/focal-agent">GitHub</a>
+            <div class="actions">
+                <a class="button" href="/focal-agent/">Read case study</a>
+                <a class="button secondary" href="https://github.com/sjweiler/focal-agent">GitHub</a>
+            </div>
         </article>
 
         <article class="card project-card">

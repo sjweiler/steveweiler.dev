@@ -1183,6 +1183,68 @@ figure figcaption {
   padding: 14px 18px 18px;
 }
 
+.agent-case-figure {
+  overflow: hidden;
+  border: 1px solid rgba(96, 165, 250, 0.22);
+  border-radius: 24px;
+  background: rgba(7, 17, 29, 0.72);
+  box-shadow: 0 30px 70px rgba(2, 6, 23, 0.62);
+}
+
+.agent-case-stage {
+  padding: clamp(18px, 4vw, 42px);
+  background:
+    radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.14), transparent 34%),
+    radial-gradient(circle at 86% 80%, rgba(168, 85, 247, 0.12), transparent 32%),
+    linear-gradient(135deg, #0a1826, #070d18);
+}
+
+.agent-case-shell {
+  width: min(860px, 100%);
+  margin: 0 auto;
+}
+
+.agent-case-body {
+  padding: clamp(18px, 4vw, 34px);
+}
+
+.agent-permission-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 13px;
+  border: 1px solid rgba(251, 191, 36, 0.28);
+  border-radius: 12px;
+  color: #cbd5e1;
+  background: rgba(120, 53, 15, 0.16);
+  font-size: 0.78rem;
+}
+
+.agent-permission-row span:first-child {
+  margin-right: auto;
+  color: #fbbf24;
+}
+
+.agent-permission-row strong,
+.agent-permission-row span:last-child {
+  padding: 4px 9px;
+  border-radius: 7px;
+}
+
+.agent-permission-row strong {
+  color: #052e2b;
+  background: #5eead4;
+}
+
+.agent-permission-row span:last-child {
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.agent-case-figure > figcaption {
+  padding: 14px 18px 18px;
+}
+
 .case-study-summary {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

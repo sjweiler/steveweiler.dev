@@ -1,0 +1,299 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Focal Agent Case Study | Steve Weiler"
+  description="A case study of Steve Weiler's local-first Windows AI desktop assistant, combining Ollama chat, offline Vosk speech recognition, and permission-gated process plugins."
+>
+  <main class="site-main case-study">
+    <section class="case-study-hero">
+      <div class="case-study-intro">
+        <p class="eyebrow">Project case study</p>
+        <div class="status-line">
+          <span class="status-badge">Alpha · Running on Windows</span>
+          <span>C# · .NET 10 · WinForms · Ollama · Vosk</span>
+        </div>
+        <h1>Focal Agent</h1>
+        <p class="case-study-lede">
+          A local-first Windows assistant that joins private AI chat, offline voice
+          input, and explicit plugin permissions in a native desktop experience.
+        </p>
+        <div class="actions">
+          <a class="button" href="https://github.com/sjweiler/focal-agent">View source on GitHub</a>
+          <a class="button secondary" href="#architecture">Explore the architecture</a>
+        </div>
+      </div>
+
+      <figure class="case-study-hero-media agent-case-figure">
+        <div class="agent-case-stage" role="img" aria-label="Focal Agent desktop conversation showing a local model response followed by a user permission request before an inventory plugin runs">
+          <div class="visual-assistant-shell agent-case-shell">
+            <div class="visual-assistant-top">
+              <span class="visual-terminal-dot dot-red"></span>
+              <span class="visual-terminal-dot dot-yellow"></span>
+              <span class="visual-terminal-dot dot-green"></span>
+              <span class="visual-assistant-title">Focal Agent</span>
+              <span class="visual-terminal-badge">Local model</span>
+            </div>
+            <div class="visual-assistant-body agent-case-body">
+              <div class="visual-assistant-chips">
+                <span>Windows</span><span>Voice ready</span><span>1 plugin</span>
+              </div>
+              <div class="visual-assistant-thread">
+                <div class="assistant-message assistant-message--user">Show me the services running on this PC.</div>
+                <div class="assistant-message assistant-message--agent">Inventory wants to run <code>services.list</code>. List Windows services.</div>
+                <div class="agent-permission-row">
+                  <span>User approval required</span>
+                  <strong>Allow</strong>
+                  <span>Deny</span>
+                </div>
+                <div class="assistant-message assistant-message--result">Ready · local inference · no cloud required</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <figcaption>The assistant keeps model choice, microphone state, and plugin authority visible to the user.</figcaption>
+      </figure>
+    </section>
+
+    <section class="case-study-summary" aria-label="Project summary">
+      <article class="case-stat">
+        <span class="case-stat-label">Role</span>
+        <strong>Creator and developer</strong>
+        <p>Windows product design, local model integration, offline speech pipeline, plugin host, and consent flow.</p>
+      </article>
+      <article class="case-stat">
+        <span class="case-stat-label">Platform</span>
+        <strong>Native Windows desktop</strong>
+        <p>A .NET 10 WinForms application with tray controls and packaged local speech assets.</p>
+      </article>
+      <article class="case-stat">
+        <span class="case-stat-label">Current state</span>
+        <strong>Working alpha</strong>
+        <p>Local chat, voice capture, and the first permission-gated plugin path are implemented; broader automation remains roadmap work.</p>
+      </article>
+    </section>
+
+    <section class="case-study-section split-section">
+      <div>
+        <p class="eyebrow">The challenge</p>
+        <h2>Make desktop AI useful without making it opaque.</h2>
+      </div>
+      <div class="prose">
+        <p>
+          A desktop assistant sits at an unusually sensitive boundary. It can hear
+          a microphone, inspect the machine, invoke tools, and send prompts to a
+          model. Convenience alone is not enough; users need to understand where
+          inference runs and when the assistant is asking for additional access.
+        </p>
+        <p>
+          Focal Agent starts with a local path. Ollama serves the language model on
+          the same Windows machine, Vosk performs speech recognition offline, and
+          plugins declare named commands in manifests. Commands marked as protected
+          stop at a native Yes/No prompt before the child process is launched.
+        </p>
+      </div>
+    </section>
+
+    <section class="case-study-section" id="architecture">
+      <div class="section-heading case-heading">
+        <p class="eyebrow">System design</p>
+        <h2>One Windows shell coordinates three deliberately separate boundaries.</h2>
+        <p>
+          Conversation, speech, and system inspection share the interface, but not
+          the same authority. Each integration has its own protocol, failure path,
+          and visible state.
+        </p>
+      </div>
+
+      <div class="control-architecture card" role="img" aria-label="Focal Agent architecture: the Windows interface accepts typed or spoken input, coordinates local Ollama inference, requests user consent for protected capabilities, and launches isolated JSON plugins">
+        <div class="control-node">
+          <span>Input</span>
+          <strong>Type or speak</strong>
+          <small>WinForms + Vosk</small>
+        </div>
+        <div class="control-link">
+          <strong>Prompt</strong>
+          <span>local UI</span>
+        </div>
+        <div class="control-node control-node--boundary">
+          <span>Coordinator</span>
+          <strong>Focal Agent</strong>
+          <small>State + consent</small>
+        </div>
+        <div class="control-link">
+          <strong>Bounded calls</strong>
+          <span>HTTP / process I/O</span>
+        </div>
+        <div class="control-node">
+          <span>Providers</span>
+          <strong>Ollama + plugins</strong>
+          <small>Inference + tools</small>
+        </div>
+      </div>
+
+      <div class="decision-grid">
+        <article class="card decision-card">
+          <span class="decision-number">01 · Inference</span>
+          <h3>Keep the default model local</h3>
+          <p>The app checks Ollama at localhost, starts its server when needed, verifies the configured model, and pulls it if absent.</p>
+        </article>
+        <article class="card decision-card">
+          <span class="decision-number">02 · Speech</span>
+          <h3>Recognize voice offline</h3>
+          <p>NAudio captures a 16 kHz mono stream and Vosk converts completed utterances into editable prompt text.</p>
+        </article>
+        <article class="card decision-card">
+          <span class="decision-number">03 · Tools</span>
+          <h3>Isolate plugins by process</h3>
+          <p>Manifest commands execute out of process through JSON stdin/stdout instead of loading third-party code into the UI runtime.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="case-study-section" id="foundations">
+      <div class="section-heading case-heading">
+        <p class="eyebrow">Engineering decisions</p>
+        <h2>Turn local-first principles into observable application behavior.</h2>
+      </div>
+
+      <div class="foundation-grid">
+        <article class="card foundation-card">
+          <span class="decision-number">01 · Local model lifecycle</span>
+          <h3>Own the setup path</h3>
+          <dl class="decision-rationale">
+            <div><dt>Constraint</dt><dd>A local assistant is frustrating if users must manually coordinate a model server before every session.</dd></div>
+            <div><dt>Decision</dt><dd>Probe Ollama's local API, start <code>ollama serve</code> when unavailable, wait for readiness, and verify <code>llama3</code>.</dd></div>
+            <div><dt>Tradeoff</dt><dd>The alpha hard-codes one model and a five-minute request timeout; model management and profiles remain future product work.</dd></div>
+          </dl>
+        </article>
+        <article class="card foundation-card">
+          <span class="decision-number">02 · Permission model</span>
+          <h3>Stop before protected work</h3>
+          <dl class="decision-rationale">
+            <div><dt>Constraint</dt><dd>Natural-language intent must not silently become operating-system authority.</dd></div>
+            <div><dt>Decision</dt><dd>Require a native confirmation for manifest commands marked <code>requiresPermission</code> and for model responses using the permission-request contract.</dd></div>
+            <div><dt>Tradeoff</dt><dd>The current convention is an alpha foundation, not yet the richer capability policy and audit system envisioned by the roadmap.</dd></div>
+          </dl>
+        </article>
+        <article class="card foundation-card">
+          <span class="decision-number">03 · Plugin supervision</span>
+          <h3>Bound external execution</h3>
+          <dl class="decision-rationale">
+            <div><dt>Constraint</dt><dd>A plugin can hang, crash, write malformed output, or disappear from disk.</dd></div>
+            <div><dt>Decision</dt><dd>Validate manifests, redirect all process streams, enforce a 15-second timeout, kill timed-out process trees, and reject empty or unsuccessful responses.</dd></div>
+            <div><dt>Tradeoff</dt><dd>Process isolation adds startup overhead but creates a much clearer operational boundary than in-process extensions.</dd></div>
+          </dl>
+        </article>
+        <article class="card foundation-card">
+          <span class="decision-number">04 · Windows experience</span>
+          <h3>Behave like a desktop utility</h3>
+          <dl class="decision-rationale">
+            <div><dt>Constraint</dt><dd>An assistant should remain accessible without permanently occupying the foreground.</dd></div>
+            <div><dt>Decision</dt><dd>Use a native WinForms window with system-tray actions to show the app, start or stop listening, and exit.</dd></div>
+            <div><dt>Tradeoff</dt><dd>The Windows-native approach supports the current product goal while postponing cross-platform UI concerns.</dd></div>
+          </dl>
+        </article>
+      </div>
+    </section>
+
+    <section class="case-study-section engineering-section">
+      <div class="engineering-copy">
+        <p class="eyebrow">End-to-end behavior</p>
+        <h2>The alpha already closes three useful loops.</h2>
+        <p>
+          Typed prompts travel to Ollama's non-streaming generate endpoint and
+          return to the conversation view. Spoken input stays local and becomes
+          editable text before submission. Plugin actions remain explicit menu
+          selections with command descriptions and permission checks.
+        </p>
+        <p>
+          Errors are also part of the experience: the interface distinguishes an
+          unreachable model server, model timeout, missing speech assets, plugin
+          timeout, nonzero exit, empty output, and plugin-reported failure.
+        </p>
+      </div>
+      <div class="tradeoff-list" aria-label="Implemented Focal Agent journeys">
+        <article class="tradeoff-item">
+          <span>Conversation</span>
+          <h3>Local Ollama chat</h3>
+          <p>Readiness checks, automatic server startup, model discovery and pull, prompt policy, and visible response state.</p>
+        </article>
+        <article class="tradeoff-item">
+          <span>Voice</span>
+          <h3>Offline speech to prompt</h3>
+          <p>Microphone capture, bundled Vosk model discovery, recognition, and insertion into the same editable prompt box.</p>
+        </article>
+        <article class="tradeoff-item">
+          <span>Plugins</span>
+          <h3>Permission-gated inventory</h3>
+          <p>Manifest discovery, command menus, consent, supervised execution, and formatted JSON results from five Windows inventory commands.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="case-study-section evidence-section">
+      <div class="section-heading case-heading">
+        <p class="eyebrow">Repository evidence · August 2026</p>
+        <h2>The implementation makes its boundaries measurable.</h2>
+        <p>These figures describe the current public <code>main</code> branch rather than the full README roadmap.</p>
+      </div>
+      <div class="evidence-grid">
+        <article class="evidence-card"><strong>3</strong><span>Working interaction paths</span><p>Typed chat, offline voice capture, and external plugin commands converge in one desktop UI.</p></article>
+        <article class="evidence-card"><strong>15s</strong><span>Plugin execution limit</span><p>A timed-out plugin is terminated with its process tree instead of running indefinitely.</p></article>
+        <article class="evidence-card"><strong>16 kHz</strong><span>Speech input</span><p>Mono microphone samples feed the bundled English Vosk recognition model.</p></article>
+        <article class="evidence-card"><strong>5</strong><span>Packaged tool commands</span><p>The inventory manifest exposes system, disk, network, process, and service queries.</p></article>
+      </div>
+    </section>
+
+    <section class="case-study-section status-section">
+      <div>
+        <p class="eyebrow">Where it stands</p>
+        <h2>A functioning local-first assistant with an intentionally narrow alpha surface.</h2>
+        <p>The code proves the core interaction and safety boundaries. It does not yet claim the persistent memory, cloud-provider breadth, or automation engine described in the long-term roadmap.</p>
+      </div>
+      <div class="status-columns">
+        <div>
+          <h3>Implemented</h3>
+          <ul class="feature-list">
+            <li>Native Windows chat interface and tray controls</li>
+            <li>Local Ollama server and model readiness flow</li>
+            <li>Offline Vosk voice recognition</li>
+            <li>Manifest-based plugin discovery and validation</li>
+            <li>User approval before protected plugin commands</li>
+            <li>JSON process protocol with timeout and error handling</li>
+            <li>Packaged read-only inventory integration</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Roadmap</h3>
+          <ul class="feature-list">
+            <li>Real cloud-provider integrations</li>
+            <li>Conversation history and persistent memory</li>
+            <li>Capability-based permissions and audit history</li>
+            <li>Tool calling driven by structured model output</li>
+            <li>File, clipboard, and screenshot workflows</li>
+            <li>Configuration profiles and complete settings</li>
+            <li>Multi-agent workflow orchestration</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="card case-study-links">
+      <div>
+        <p class="eyebrow">Go deeper</p>
+        <h2>Read the product direction and inspect the working boundaries.</h2>
+        <p>The repository documents the target experience and exposes the current Windows implementation.</p>
+      </div>
+      <div class="doc-links">
+        <a href="https://github.com/sjweiler/focal-agent">Repository <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/sjweiler/focal-agent/blob/main/README.md">Product goals and roadmap <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/sjweiler/focal-agent/blob/main/docs/plugin-system.md">Plugin system <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/sjweiler/focal-agent/blob/main/FocalAgent/FocalAgentWindow.cs">Desktop, Ollama, and voice flow <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/sjweiler/focal-agent/blob/main/FocalAgent/PluginHost/PluginProcessClient.cs">Plugin supervision <span aria-hidden="true">↗</span></a>
+        <a href="/focal-agent-inventory/">Inventory plugin case study <span aria-hidden="true">→</span></a>
+      </div>
+    </section>
+  </main>
+</BaseLayout>
