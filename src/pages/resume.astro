@@ -1,33 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume | Steve Weiler</title>
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
 
-<header>
-    <nav>
-        <strong>Steve Weiler</strong>
-
-        <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="projects.html">Projects</a></li>
-            <li><a href="resume.html" class="active">Resume</a></li>
-            <li><a href="contact.html">Contact</a></li>
-        </ul>
-    </nav>
-</header>
-
+<BaseLayout
+  title="Resume | Steve Weiler"
+  description="Steve Weiler's systems engineering, infrastructure, software development, and AI experience."
+>
 <main>
 
 <section class="page-header">
     <h1>Resume</h1>
     <p>Systems Engineer • Infrastructure • Software Development • AI</p>
 
-    <a class="button" href="resume/Steve-Weiler-Resume.pdf" download>
+    <a class="button" href="/resume/Steve-Weiler-Resume.pdf" download>
         Download PDF Resume
     </a>
 </section>
@@ -117,10 +102,4 @@
 </section>
 
 </main>
-
-<footer>
-    <p>&copy; 2026 Steve Weiler</p>
-</footer>
-
-</body>
-</html>
+</BaseLayout>

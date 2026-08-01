@@ -1,25 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="A case study of FocalDesk, Steve Weiler's Rust-based Wayland desktop environment.">
-  <title>FocalDesk Case Study | Steve Weiler</title>
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-  <header class="site-header">
-    <nav class="site-nav" aria-label="Primary">
-      <strong class="brand">Steve Weiler</strong>
-      <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="projects.html" class="active">Projects</a></li>
-        <li><a href="resume.html">Resume</a></li>
-        <li><a href="contact.html">Contact</a></li>
-      </ul>
-    </nav>
-  </header>
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
 
+<BaseLayout
+  title="FocalDesk Case Study | Steve Weiler"
+  description="A case study of FocalDesk, Steve Weiler's Rust-based Wayland desktop environment."
+>
   <main class="site-main case-study">
     <section class="case-study-hero">
       <div class="case-study-intro">
@@ -32,6 +18,8 @@
         <p class="case-study-lede">
           A custom Wayland desktop environment built to explore what a fast,
           cohesive, keyboard-friendly Linux desktop can be—without treating the
+          compositor as a monolith.A custom Wayland desktop environment built to explore what a fast,
+          cohesive, keyboard-friendly Linux desktop can be—without treating the
           compositor as a monolith.
         </p>
         <div class="actions">
@@ -41,7 +29,7 @@
       </div>
 
       <figure class="case-study-hero-media">
-        <img src="assets/focaldesk/desktop.png" alt="FocalDesk desktop with its aerospace-inspired shell, top bar, and side navigation">
+        <img src="/images/focaldesk/desktop.png" alt="FocalDesk desktop with its aerospace-inspired shell, top bar, and side navigation">
         <figcaption>The FocalDesk compositor and shell running as a complete desktop session.</figcaption>
       </figure>
     </section>
@@ -96,7 +84,7 @@
       </div>
 
       <figure class="architecture-figure card">
-        <img src="assets/focaldesk/architecture-overview-v2.svg" alt="Diagram showing applications entering the FocalDesk compositor, frames moving through the renderer and hardware backends, and typed IPC connecting out-of-process desktop services">
+        <img src="/images/focaldesk/architecture-overview-v2.svg" alt="Diagram showing applications entering the FocalDesk compositor, frames moving through the renderer and hardware backends, and typed IPC connecting out-of-process desktop services">
         <figcaption>
           Current high-level architecture. Solid paths show implemented system
           boundaries; dashed outlines identify experimental areas whose behavior
@@ -300,19 +288,19 @@
 
       <div class="case-gallery">
         <figure class="gallery-item gallery-item--wide">
-          <img src="assets/focaldesk/launcher.png" loading="lazy" alt="FocalDesk native application launcher open over the desktop">
+          <img src="/images/focaldesk/launcher.png" loading="lazy" alt="FocalDesk native application launcher open over the desktop">
           <figcaption><strong>Launcher</strong><span>Application discovery through a dedicated launch service.</span></figcaption>
         </figure>
         <figure class="gallery-item">
-          <img src="assets/focaldesk/settings.png" loading="lazy" alt="FocalDesk settings application">
+          <img src="/images/focaldesk/settings.png" loading="lazy" alt="FocalDesk settings application">
           <figcaption><strong>Settings prototype</strong><span>Appearance, display, input, privacy, power, and service controls; some panels remain incomplete or hardware-dependent.</span></figcaption>
         </figure>
         <figure class="gallery-item">
-          <img src="assets/focaldesk/files.png" loading="lazy" alt="FocalDesk native file manager">
+          <img src="/images/focaldesk/files.png" loading="lazy" alt="FocalDesk native file manager">
           <figcaption><strong>Files prototype</strong><span>First-party browsing, search, sorting, and list/grid workflows.</span></figcaption>
         </figure>
         <figure class="gallery-item gallery-item--wide">
-          <img src="assets/focaldesk/ai-permission.png" loading="lazy" alt="FocalDesk AI Console showing a native permission request">
+          <img src="/images/focaldesk/ai-permission.png" loading="lazy" alt="FocalDesk AI Console showing a native permission request">
           <figcaption><strong>Experimental AI</strong><span>A model request stops at a visible native permission boundary before proceeding.</span></figcaption>
         </figure>
       </div>
@@ -330,7 +318,7 @@
         </p>
       </div>
       <figure class="gallery-item">
-        <img src="assets/focaldesk/wine-dxvk.png" loading="lazy" alt="A 3D game running through Wine and DXVK on FocalDesk">
+        <img src="/images/focaldesk/wine-dxvk.png" loading="lazy" alt="A 3D game running through Wine and DXVK on FocalDesk">
         <figcaption><strong>Wine / DXVK</strong><span>A demanding compatibility and rendering test.</span></figcaption>
       </figure>
     </section>
@@ -381,9 +369,4 @@
       </div>
     </section>
   </main>
-
-  <footer class="site-footer">
-    <p>&copy; 2026 Steve Weiler</p>
-  </footer>
-</body>
-</html>
+</BaseLayout>

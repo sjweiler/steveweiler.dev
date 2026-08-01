@@ -1,0 +1,32 @@
+---
+const currentPath = Astro.url.pathname;
+
+const navigation = [
+  { href: "/", label: "Home", active: currentPath === "/" },
+  {
+    href: "/projects/",
+    label: "Projects",
+    active: currentPath === "/projects/" || currentPath === "/focaldesk/",
+  },
+  {
+    href: "/engineering/",
+    label: "Engineering",
+    active: currentPath.startsWith("/engineering/"),
+  },
+  { href: "/resume/", label: "Resume", active: currentPath === "/resume/" },
+  { href: "https://github.com/sjweiler", label: "GitHub", active: false },
+];
+---
+
+<header class="site-header">
+  <nav class="site-nav" aria-label="Primary">
+    <strong class="brand">Steve Weiler</strong>
+    <ul>
+      {
+        navigation.map(({ href, label, active }) => (
+          <li><a href={href} class:list={{ active }}>{label}</a></li>
+        ))
+      }
+    </ul>
+  </nav>
+</header>

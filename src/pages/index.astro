@@ -1,24 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Steve Weiler</title>
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-  <header class="site-header">
-    <nav class="site-nav" aria-label="Primary">
-      <strong class="brand">Steve Weiler</strong>
-      <ul>
-        <li><a href="index.html" class="active">Home</a></li>
-        <li><a href="projects.html">Projects</a></li>
-        <li><a href="resume.html">Resume</a></li>
-        <li><a href="contact.html">Contact</a></li>
-      </ul>
-    </nav>
-  </header>
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
 
+<BaseLayout
+  title="Steve Weiler"
+  description="Systems engineer and software developer specializing in infrastructure, desktop software, automation, and AI-enabled systems."
+>
   <main class="site-main">
     <section class="hero hero-grid">
       <div class="hero-copy">
@@ -28,10 +15,10 @@
           I combine 25+ years of enterprise IT experience with infrastructure,
           desktop, and software development in Rust, C#, Go, Python, Windows,
           Linux, and AI-assisted systems.
-        </p>
+          </p>
         <div class="actions">
-          <a class="button" href="projects.html">View Projects</a>
-          <a class="button secondary" href="resume/Steve-Weiler-Resume.pdf">Download Resume</a>
+          <a class="button" href="/projects/">View Projects</a>
+          <a class="button secondary" href="/resume/Steve-Weiler-Resume.pdf">Download Resume</a>
         </div>
       </div>
 
@@ -70,19 +57,19 @@
         <div class="project-header">
           <div class="project-badge">FD</div>
           <div>
-            <h3><a class="project-title-link" href="focaldesk.html">FocalDesk</a></h3>
+            <h3><a class="project-title-link" href="/focaldesk/">FocalDesk</a></h3>
             <p class="project-kicker">Wayland desktop environment</p>
           </div>
         </div>
-        <a class="project-visual project-visual--focaldesk project-visual-link" href="focaldesk.html" aria-label="Read the FocalDesk case study">
+        <a class="project-visual project-visual--focaldesk project-visual-link" href="/focaldesk/" aria-label="Read the FocalDesk case study">
           <img
             class="project-visual-image project-visual-image--contain"
-            src="assets/focaldesk-screenshot.png"
+            src="/images/focaldesk-screenshot.png"
             alt="FocalDesk desktop environment screenshot"
           >
         </a>
         <p>Rust Wayland desktop environment with compositor, native apps, encrypted credential storage, capture, and AI integration.</p>
-        <a class="project-text-link" href="focaldesk.html">Read case study <span aria-hidden="true">→</span></a>
+        <a class="project-text-link" href="/focaldesk/">Read case study <span aria-hidden="true">→</span></a>
       </article>
 
       <article class="card project-card">
@@ -132,7 +119,7 @@
         <div class="project-visual project-visual--infra">
           <img
             class="project-visual-image"
-            src="assets/infrastructure-admin-graphic.png"
+            src="/images/infrastructure-admin-graphic.png"
             alt="Infrastructure administration dashboard visualization"
           >
         </div>
@@ -148,12 +135,7 @@
           I take on projects where operations, automation, and product thinking need to work together.
         </p>
       </div>
-      <a class="button" href="contact.html">Start a conversation</a>
+      <a class="button" href="/contact/">Start a conversation</a>
     </section>
   </main>
-
-  <footer class="site-footer">
-    <p>&copy; 2026 Steve Weiler</p>
-  </footer>
-</body>
-</html>
+</BaseLayout>

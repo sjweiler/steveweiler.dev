@@ -1,26 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projects | Steve Weiler</title>
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
 
-<header>
-    <nav>
-        <strong>Steve Weiler</strong>
-
-        <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="projects.html" class="active">Projects</a></li>
-            <li><a href="resume.html">Resume</a></li>
-            <li><a href="contact.html">Contact</a></li>
-        </ul>
-    </nav>
-</header>
-
+<BaseLayout
+  title="Projects | Steve Weiler"
+  description="Desktop, infrastructure, AI, and automation projects by Steve Weiler."
+>
 <main>
 
     <section class="page-header">
@@ -34,15 +19,15 @@
             <div class="project-header">
                 <div class="project-badge">FD</div>
                 <div>
-                    <h2><a class="project-title-link" href="focaldesk.html">FocalDesk</a></h2>
+                    <h2><a class="project-title-link" href="/focaldesk/">FocalDesk</a></h2>
                     <p class="project-kicker">Wayland desktop environment</p>
                 </div>
             </div>
 
-            <a class="project-visual project-visual--focaldesk project-visual-link" href="focaldesk.html" aria-label="Read the FocalDesk case study">
+            <a class="project-visual project-visual--focaldesk project-visual-link" href="/focaldesk/" aria-label="Read the FocalDesk case study">
                 <img
                     class="project-visual-image project-visual-image--contain"
-                    src="assets/focaldesk-screenshot.png"
+                    src="/images/focaldesk-screenshot.png"
                     alt="FocalDesk desktop environment screenshot"
                 >
             </a>
@@ -56,7 +41,7 @@
             <p><strong>Technologies:</strong> Rust, Wayland, Smithay, OpenGL ES</p>
 
             <div class="actions">
-                <a class="button" href="focaldesk.html">Read case study</a>
+                <a class="button" href="/focaldesk/">Read case study</a>
                 <a class="button secondary" href="https://github.com/sjweiler/focaldesk">GitHub</a>
             </div>
         </article>
@@ -131,9 +116,9 @@
                                 <div><span class="json-key">hostname</span><span class="json-sep">:</span> <span class="json-string">"workstation-01"</span></div>
                                 <div><span class="json-key">os</span><span class="json-sep">:</span> <span class="json-string">"linux"</span></div>
                                 <div><span class="json-key">services</span><span class="json-sep">:</span> <span class="json-number">24</span></div>
-                                <div><span class="json-key">network</span><span class="json-sep">:</span> <span class="json-brace">{</span></div>
+                                <div><span class="json-key">network</span><span class="json-sep">:</span> <span class="json-brace">&#123;</span></div>
                                 <div class="json-indent"><span class="json-key">ip</span><span class="json-sep">:</span> <span class="json-string">"192.168.1.42"</span></div>
-                                <div><span class="json-brace">}</span></div>
+                                <div><span class="json-brace">&#125;</span></div>
                             </div>
                         </div>
                     </div>
@@ -150,6 +135,86 @@
             <a class="button" href="https://github.com/sjweiler/focal-agent-inventory-plugin">GitHub</a>
         </article>
 
+        <article class="card project-card">
+            <div class="project-header">
+                <div class="project-badge">FV</div>
+                <div>
+                    <h2>FocalVector</h2>
+                    <p class="project-kicker">Low-latency vector database</p>
+                </div>
+            </div>
+
+            <div
+                class="project-visual project-visual--vector"
+                role="img"
+                aria-label="FocalVector architecture: clients connect over HTTP or gRPC to a collection router, which branches to query execution over HNSW and metadata indexes and coordinated writes through a write-ahead log and memtable into durable vector storage"
+            >
+                <div class="vector-architecture">
+                    <div class="vector-flow">
+                        <span class="vector-node vector-node--client">Client</span>
+                        <span class="vector-connector">HTTP / gRPC</span>
+                        <span class="vector-node vector-node--router">Collection router</span>
+                        <div class="vector-branches">
+                            <div>
+                                <span class="vector-node">Query executor</span>
+                                <span class="vector-detail">HNSW + metadata</span>
+                            </div>
+                            <div>
+                                <span class="vector-node">Write coordinator</span>
+                                <span class="vector-detail">WAL + memtable</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vector-database" aria-hidden="true">
+                        <svg viewBox="0 0 88 112">
+                            <ellipse cx="44" cy="20" rx="32" ry="12"></ellipse>
+                            <path d="M12 20v24c0 6.6 14.3 12 32 12s32-5.4 32-12V20"></path>
+                            <path d="M12 44v24c0 6.6 14.3 12 32 12s32-5.4 32-12V44"></path>
+                            <path d="M12 68v24c0 6.6 14.3 12 32 12s32-5.4 32-12V68"></path>
+                        </svg>
+                        <strong>Vectors</strong>
+                    </div>
+                </div>
+            </div>
+
+            <p>
+                Durable Rust vector database with exact and HNSW search, metadata
+                filtering, WAL-backed persistence, sharding, and replication.
+            </p>
+
+            <p><strong>Technologies:</strong> Rust, HNSW, OpenRaft, CRC32C</p>
+
+            <a class="button" href="https://github.com/sjweiler/focal-vector">GitHub</a>
+        </article>
+
+        <article class="card project-card">
+            <div class="project-header">
+                <div class="project-badge">FC</div>
+                <div>
+                    <h2>Focal Control Center</h2>
+                    <p class="project-kicker">FocalDesk administration and diagnostics</p>
+                </div>
+            </div>
+
+            <div class="project-visual project-visual--control-center">
+                <img
+                    class="project-visual-image project-visual-image--contain"
+                    src="/images/focal-control-center-overview.png"
+                    alt="Focal Control Center dashboard showing system health, resource usage, sessions, displays, and services"
+                >
+            </div>
+
+            <p>
+                Browser-based administration and diagnostics console with live FocalDesk
+                system, service, session, display, GPU, and log telemetry.
+            </p>
+
+            <p><strong>Technologies:</strong> React, Node.js, Express, Server-Sent Events</p>
+
+            <a class="button" href="https://github.com/sjweiler/focaldesk-control-center">GitHub</a>
+        </article>
+
     </section>
 
     <section class="card cta-strip">
@@ -161,14 +226,8 @@
                 and automation that reduces friction.
             </p>
         </div>
-        <a class="button secondary" href="contact.html">Discuss a project</a>
+        <a class="button secondary" href="/contact/">Discuss a project</a>
     </section>
 
 </main>
-
-<footer>
-    <p>&copy; 2026 Steve Weiler</p>
-</footer>
-
-</body>
-</html>
+</BaseLayout>
