@@ -76,11 +76,11 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         <div class="project-header">
           <div class="project-badge">FA</div>
           <div>
-            <h3>Focal Agent</h3>
-            <p class="project-kicker">AI desktop assistant</p>
+            <h3><a class="project-title-link" href="/focal-agent/">Focal Agent</a></h3>
+            <p class="project-kicker">Local-first Windows AI assistant</p>
           </div>
         </div>
-        <div class="project-visual project-visual--focal-agent" aria-hidden="true">
+        <a class="project-visual project-visual--focal-agent project-visual-link" href="/focal-agent/" aria-label="Read the Focal Agent case study">
           <div class="visual-assistant">
             <div class="visual-assistant-shell">
               <div class="visual-assistant-top">
@@ -97,15 +97,16 @@ import BaseLayout from "../layouts/BaseLayout.astro";
                   <span>System</span>
                 </div>
                 <div class="visual-assistant-thread">
-                  <div class="assistant-message assistant-message--user">Open notes and summarize the meeting.</div>
-                  <div class="assistant-message assistant-message--agent">Launching app, extracting actions, saving summary.</div>
-                  <div class="assistant-message assistant-message--result">Done · 4 tasks · 1 follow-up</div>
+                  <div class="assistant-message assistant-message--user">What is running on this PC?</div>
+                  <div class="assistant-message assistant-message--agent">The Inventory plugin needs permission to inspect processes.</div>
+                  <div class="assistant-message assistant-message--result">Permission required · Review request</div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        <p>Windows AI assistant concept with plugins, system actions, voice, and local/cloud LLM support.</p>
+        </a>
+        <p>Windows desktop assistant with local Ollama chat, offline Vosk voice input, and permission-gated external plugins.</p>
+        <a class="project-text-link" href="/focal-agent/">Read case study <span aria-hidden="true">→</span></a>
       </article>
 
       <article class="card project-card">
