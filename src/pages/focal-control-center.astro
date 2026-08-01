@@ -1,0 +1,315 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Focal Control Center Case Study | Steve Weiler"
+  description="A case study of Focal Control Center, Steve Weiler's React and Node.js administration and diagnostics console for FocalDesk."
+>
+  <main class="site-main case-study">
+    <section class="case-study-hero">
+      <div class="case-study-intro">
+        <p class="eyebrow">Project case study</p>
+        <div class="status-line">
+          <span class="status-badge">Working integration · Active development</span>
+          <span>React · Node.js · Express · SSE · Unix IPC</span>
+        </div>
+        <h1>Focal Control Center</h1>
+        <p class="case-study-lede">
+          A browser-based operations console that makes FocalDesk health,
+          services, sessions, displays, GPU state, and logs visible—without
+          turning the browser into an unrestricted desktop control plane.
+        </p>
+        <div class="actions">
+          <a class="button" href="https://github.com/sjweiler/focaldesk-control-center">View source on GitHub</a>
+          <a class="button secondary" href="#architecture">Explore the architecture</a>
+        </div>
+      </div>
+
+      <figure class="case-study-hero-media">
+        <img
+          src="/images/focal-control-center-overview.png"
+          alt="Focal Control Center dashboard showing system health, live CPU, memory and GPU metrics, session details, displays, services, and recent logs"
+        >
+        <figcaption>A unified, responsive view of the current FocalDesk session and its supporting services.</figcaption>
+      </figure>
+    </section>
+
+    <section class="case-study-summary" aria-label="Project summary">
+      <article class="case-stat">
+        <span class="case-stat-label">Role</span>
+        <strong>Creator and lead developer</strong>
+        <p>Product design, React interface, Node.js BFF, IPC integration, service hardening, tests, and delivery automation.</p>
+      </article>
+      <article class="case-stat">
+        <span class="case-stat-label">Scope</span>
+        <strong>Dashboard, API, and adapter</strong>
+        <p>Responsive operations UI, read-oriented REST surface, live event stream, validated Unix-socket transport, and simulator.</p>
+      </article>
+      <article class="case-stat">
+        <span class="case-stat-label">Current state</span>
+        <strong>Integrated diagnostics console</strong>
+        <p>Runs against the authenticated FocalDesk telemetry socket or switches safely to simulated data for isolated development.</p>
+      </article>
+    </section>
+
+    <section class="case-study-section split-section">
+      <div>
+        <p class="eyebrow">The challenge</p>
+        <h2>Expose useful operations data without exposing desktop authority.</h2>
+      </div>
+      <div class="prose">
+        <p>
+          A desktop control center needs enough context to explain what is
+          happening across the compositor, session, rendering, credentials,
+          notifications, and AI services. A browser, however, is the wrong place
+          to receive raw privileged IPC or arbitrary command execution.
+        </p>
+        <p>
+          Focal Control Center puts a deliberately narrow backend-for-frontend
+          between those worlds. The BFF subscribes to a private diagnostics
+          socket, validates every snapshot, exposes a small read-oriented API,
+          and pushes updates to the React interface through one-way Server-Sent
+          Events.
+        </p>
+      </div>
+    </section>
+
+    <section class="case-study-section" id="architecture">
+      <div class="section-heading case-heading">
+        <p class="eyebrow">System design</p>
+        <h2>A narrow bridge from trusted IPC to a browser-safe view.</h2>
+        <p>
+          The browser never connects to FocalDesk services directly. The Express
+          BFF owns transport, validation, transformation, reconnect behavior,
+          static delivery, and response security headers.
+        </p>
+      </div>
+
+      <div class="control-architecture card" role="img" aria-label="Focal Control Center architecture: React dashboard uses REST and one-way server-sent events to communicate with an Express backend-for-frontend, which validates versioned telemetry snapshots received from focaldesk-server over a private Unix socket">
+        <div class="control-node">
+          <span>Browser</span>
+          <strong>React dashboard</strong>
+          <small>Responsive operations UI</small>
+        </div>
+        <div class="control-link">
+          <strong>REST + SSE</strong>
+          <span>Read-oriented</span>
+        </div>
+        <div class="control-node control-node--boundary">
+          <span>Safety boundary</span>
+          <strong>Express BFF</strong>
+          <small>Validate · reshape · stream</small>
+        </div>
+        <div class="control-link">
+          <strong>FocalDesk v1</strong>
+          <span>Unix socket</span>
+        </div>
+        <div class="control-node">
+          <span>Desktop service</span>
+          <strong>focaldesk-server</strong>
+          <small>Authenticated telemetry</small>
+        </div>
+      </div>
+
+      <div class="decision-grid">
+        <article class="card decision-card">
+          <span class="decision-number">01 · Browser boundary</span>
+          <h3>No raw desktop IPC</h3>
+          <p>The adapter accepts only versioned, schema-valid snapshot envelopes and never forwards raw socket frames to the client.</p>
+        </article>
+        <article class="card decision-card">
+          <span class="decision-number">02 · Live updates</span>
+          <h3>One-way event streaming</h3>
+          <p>SSE delivers snapshots and logs with heartbeats while avoiding a general browser-to-service command channel.</p>
+        </article>
+        <article class="card decision-card">
+          <span class="decision-number">03 · Development</span>
+          <h3>Safe simulator fallback</h3>
+          <p>When the socket is unavailable, realistic local telemetry keeps UI work unblocked while the adapter continues trying to reconnect.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="case-study-section" id="foundations">
+      <div class="section-heading case-heading">
+        <p class="eyebrow">Engineering decisions</p>
+        <h2>Keep the interface useful and the authority intentionally small.</h2>
+        <p>
+          The architecture favors an observable, testable data path over a broad
+          administration API. Every added capability must fit the same local,
+          validated, least-authority model.
+        </p>
+      </div>
+
+      <div class="foundation-grid">
+        <article class="card foundation-card">
+          <span class="decision-number">01 · API shape</span>
+          <h3>A BFF instead of direct service calls</h3>
+          <dl class="decision-rationale">
+            <div><dt>Constraint</dt><dd>FocalDesk IPC types and transport details should not become a public browser contract.</dd></div>
+            <div><dt>Decision</dt><dd>Expose focused health, overview, service, log, configuration, and stream endpoints from a small Express process.</dd></div>
+            <div><dt>Tradeoff</dt><dd>The BFF is another process to package and supervise, but it isolates protocol change and keeps privileged transport out of the UI.</dd></div>
+          </dl>
+        </article>
+
+        <article class="card foundation-card">
+          <span class="decision-number">02 · Input validation</span>
+          <h3>Schemas at both boundaries</h3>
+          <dl class="decision-rationale">
+            <div><dt>Constraint</dt><dd>Both browser input and service telemetry can be malformed, oversized, stale, or outside expected ranges.</dd></div>
+            <div><dt>Decision</dt><dd>Use strict Zod schemas, bounded arrays and strings, allowlisted preferences, capped JSON bodies, and versioned envelopes.</dd></div>
+            <div><dt>Tradeoff</dt><dd>Protocol evolution requires coordinated schema updates, but unexpected data cannot silently become trusted UI state.</dd></div>
+          </dl>
+        </article>
+
+        <article class="card foundation-card">
+          <span class="decision-number">03 · Delivery</span>
+          <h3>One production process</h3>
+          <dl class="decision-rationale">
+            <div><dt>Constraint</dt><dd>The packaged console needs a predictable local origin, simple service lifecycle, and no development proxy.</dd></div>
+            <div><dt>Decision</dt><dd>Build the React application with Vite and serve its static output and API from the same compressed Express server.</dd></div>
+            <div><dt>Tradeoff</dt><dd>The BFF serves frontend assets as well as data, but deployment becomes one loopback-only user service.</dd></div>
+          </dl>
+        </article>
+
+        <article class="card foundation-card">
+          <span class="decision-number">04 · Service hardening</span>
+          <h3>A constrained systemd user unit</h3>
+          <dl class="decision-rationale">
+            <div><dt>Constraint</dt><dd>A diagnostics process should not inherit broad filesystem or privilege access merely because it runs inside a desktop session.</dd></div>
+            <div><dt>Decision</dt><dd>Bind to loopback and use <code>NoNewPrivileges</code>, private temporary storage, strict system protection, read-only home access, and a restrictive umask.</dd></div>
+            <div><dt>Tradeoff</dt><dd>The service requires an explicit installation path and socket allowance, but its operating boundary is visible and reviewable.</dd></div>
+          </dl>
+        </article>
+      </div>
+    </section>
+
+    <section class="case-study-section engineering-section">
+      <div class="engineering-copy">
+        <p class="eyebrow">Engineering deep dive</p>
+        <h2>Live telemetry survives a missing or restarting desktop service.</h2>
+        <p>
+          At startup, the adapter checks for the private control-center socket.
+          If available, it sends one versioned subscription request and consumes
+          newline-delimited snapshots. If the connection closes, it returns to
+          simulation and schedules a reconnect instead of leaving the dashboard
+          frozen or crashing the web process.
+        </p>
+        <p>
+          The React client first loads a complete overview, then opens one SSE
+          stream for snapshots and log events. Connection state remains visible
+          as “Live” or “Demo data,” so fallback behavior is explicit to the user.
+        </p>
+      </div>
+      <div class="tradeoff-list" aria-label="Telemetry flow">
+        <article class="tradeoff-item">
+          <span>Subscribe</span>
+          <h3>Request a bounded snapshot interval.</h3>
+          <p>The adapter sends a FocalDesk v1 subscription envelope over the local Unix socket.</p>
+        </article>
+        <article class="tradeoff-item">
+          <span>Validate</span>
+          <h3>Accept only complete known telemetry shapes.</h3>
+          <p>System, health, metrics, session, display, GPU, service, log, AI, and credential fields are range- and size-checked.</p>
+        </article>
+        <article class="tradeoff-item">
+          <span>Stream</span>
+          <h3>Translate snapshots into browser events.</h3>
+          <p>The BFF sends named SSE events and heartbeats, then removes listeners when a client disconnects.</p>
+        </article>
+        <article class="tradeoff-item">
+          <span>Recover</span>
+          <h3>Fall back visibly and reconnect automatically.</h3>
+          <p>The simulator maintains a useful interface during service development without pretending that its data is live.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="case-study-section evidence-section">
+      <div class="section-heading case-heading">
+        <p class="eyebrow">Repository evidence · August 2026</p>
+        <h2>Small surfaces make the boundary easier to test and review.</h2>
+        <p>
+          The current implementation stays intentionally compact. The figures
+          below describe explicit limits and automation visible in the source,
+          not estimates of future functionality.
+        </p>
+      </div>
+      <div class="evidence-grid">
+        <article class="evidence-card">
+          <strong>7</strong>
+          <span>API operations</span>
+          <p>Health, overview, services, filtered logs, configuration read/write, and the live SSE stream.</p>
+        </article>
+        <article class="evidence-card">
+          <strong>32 KB</strong>
+          <span>Maximum JSON body</span>
+          <p>Browser requests are capped before strict configuration validation is applied.</p>
+        </article>
+        <article class="evidence-card">
+          <strong>256 KB</strong>
+          <span>Maximum accepted IPC frame</span>
+          <p>Oversized newline-delimited frames are discarded before their contents can reach the browser.</p>
+        </article>
+        <article class="evidence-card">
+          <strong>2</strong>
+          <span>Automated quality workflows</span>
+          <p>CI builds and runs four server/adapter tests; CodeQL analyzes JavaScript on changes and weekly.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="case-study-section status-section">
+      <div>
+        <p class="eyebrow">Where it stands</p>
+        <h2>A focused diagnostics surface, not a remote shell.</h2>
+        <p>
+          The console is useful today for understanding a local FocalDesk session.
+          Its limitations are part of the security design: it reports service
+          health without exposing secrets or accepting arbitrary system actions.
+        </p>
+      </div>
+      <div class="status-columns">
+        <div>
+          <h3>Implemented</h3>
+          <ul class="feature-list">
+            <li>System, session, display, GPU, and service overview</li>
+            <li>Searchable, level-filtered live logs</li>
+            <li>Real-time snapshots and log events over SSE</li>
+            <li>Authenticated FocalDesk diagnostics socket integration</li>
+            <li>Simulator fallback with automatic reconnect</li>
+            <li>Strict telemetry and preference validation</li>
+            <li>Responsive interface and hardened user service</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Deliberately excluded or bounded</h3>
+          <ul class="feature-list">
+            <li>No shell-command execution endpoint</li>
+            <li>No raw IPC frames exposed to the browser</li>
+            <li>No browser-to-service general command channel</li>
+            <li>No credential names or secret values in telemetry</li>
+            <li>Configuration limited to allowlisted console preferences</li>
+            <li>Loopback-only HTTP server by default</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="card case-study-links">
+      <div>
+        <p class="eyebrow">Go deeper</p>
+        <h2>Read the integration and security details.</h2>
+        <p>The repository documents local development, production installation, IPC envelopes, API routes, hardening, and automated checks.</p>
+      </div>
+      <div class="doc-links">
+        <a href="https://github.com/sjweiler/focaldesk-control-center">Repository <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/sjweiler/focaldesk-control-center/blob/main/README.md">Integration guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/sjweiler/focaldesk-control-center/blob/main/server/ipc-adapter.js">IPC adapter <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/sjweiler/focaldesk-control-center/blob/main/server/app.js">BFF and API <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/sjweiler/focaldesk-control-center/blob/main/deploy/focaldesk-control-center.service">Hardened user service <span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+  </main>
+</BaseLayout>

@@ -196,18 +196,18 @@ import BaseLayout from "../layouts/BaseLayout.astro";
             <div class="project-header">
                 <div class="project-badge">FC</div>
                 <div>
-                    <h2>Focal Control Center</h2>
+                    <h2><a class="project-title-link" href="/focal-control-center/">Focal Control Center</a></h2>
                     <p class="project-kicker">FocalDesk administration and diagnostics</p>
                 </div>
             </div>
 
-            <div class="project-visual project-visual--control-center">
+            <a class="project-visual project-visual--control-center project-visual-link" href="/focal-control-center/" aria-label="Read the Focal Control Center case study">
                 <img
                     class="project-visual-image project-visual-image--contain"
                     src="/images/focal-control-center-overview.png"
                     alt="Focal Control Center dashboard showing system health, resource usage, sessions, displays, and services"
                 >
-            </div>
+            </a>
 
             <p>
                 Browser-based administration and diagnostics console with live FocalDesk
@@ -216,7 +216,10 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
             <p><strong>Technologies:</strong> React, Node.js, Express, Server-Sent Events</p>
 
-            <a class="button" href="https://github.com/sjweiler/focaldesk-control-center">GitHub</a>
+            <div class="actions">
+                <a class="button" href="/focal-control-center/">Read case study</a>
+                <a class="button secondary" href="https://github.com/sjweiler/focaldesk-control-center">GitHub</a>
+            </div>
         </article>
 
     </section>
