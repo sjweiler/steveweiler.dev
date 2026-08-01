@@ -111,20 +111,47 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
       <article class="card project-card">
         <div class="project-header">
-          <div class="project-badge">IA</div>
+          <div class="project-badge">FV</div>
           <div>
-            <h3>Infrastructure Automation</h3>
-            <p class="project-kicker">Operations tooling</p>
+            <h3><a class="project-title-link" href="/focalvector/">FocalVector</a></h3>
+            <p class="project-kicker">Low-latency vector database</p>
           </div>
         </div>
-        <div class="project-visual project-visual--infra">
-          <img
-            class="project-visual-image"
-            src="/images/infrastructure-admin-graphic.png"
-            alt="Infrastructure administration dashboard visualization"
-          >
-        </div>
-        <p>Monitoring, VMware migration, OpenNMS dashboards, document automation, and internal business tools.</p>
+        <a
+          class="project-visual project-visual--vector project-visual-link"
+          href="/focalvector/"
+          role="img"
+          aria-label="Read the FocalVector case study"
+        >
+          <div class="vector-architecture">
+            <div class="vector-flow">
+              <span class="vector-node vector-node--client">Client</span>
+              <span class="vector-connector">HTTP / local IPC</span>
+              <span class="vector-node vector-node--router">Collection router</span>
+              <div class="vector-branches">
+                <div>
+                  <span class="vector-node">Query executor</span>
+                  <span class="vector-detail">HNSW + metadata</span>
+                </div>
+                <div>
+                  <span class="vector-node">Write coordinator</span>
+                  <span class="vector-detail">WAL + memtable</span>
+                </div>
+              </div>
+            </div>
+            <div class="vector-database" aria-hidden="true">
+              <svg viewBox="0 0 88 112">
+                <ellipse cx="44" cy="20" rx="32" ry="12"></ellipse>
+                <path d="M12 20v24c0 6.6 14.3 12 32 12s32-5.4 32-12V20"></path>
+                <path d="M12 44v24c0 6.6 14.3 12 32 12s32-5.4 32-12V44"></path>
+                <path d="M12 68v24c0 6.6 14.3 12 32 12s32-5.4 32-12V68"></path>
+              </svg>
+              <strong>Vectors</strong>
+            </div>
+          </div>
+        </a>
+        <p>Durable Rust vector database with exact and HNSW search, metadata filtering, WAL-backed persistence, sharding, and replication.</p>
+        <a class="project-text-link" href="/focalvector/">Read case study <span aria-hidden="true">→</span></a>
       </article>
     </section>
 
