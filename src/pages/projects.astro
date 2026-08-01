@@ -95,12 +95,12 @@ import BaseLayout from "../layouts/BaseLayout.astro";
             <div class="project-header">
                 <div class="project-badge">IA</div>
                 <div>
-                    <h2>Focal Agent Inventory Plugin</h2>
-                    <p class="project-kicker">Cross-platform inventory tool</p>
+                    <h2><a class="project-title-link" href="/focal-agent-inventory/">Focal Agent Inventory Plugin</a></h2>
+                    <p class="project-kicker">Read-only Windows inventory plugin</p>
                 </div>
             </div>
 
-            <div class="project-visual project-visual--infra" aria-hidden="true">
+            <a class="project-visual project-visual--infra project-visual-link" href="/focal-agent-inventory/" aria-label="Read the Focal Agent Inventory Plugin case study">
                 <div class="visual-terminal">
                     <div class="visual-terminal-shell">
                         <div class="visual-terminal-top">
@@ -111,28 +111,31 @@ import BaseLayout from "../layouts/BaseLayout.astro";
                             <span class="visual-terminal-badge">Go</span>
                         </div>
                         <div class="visual-terminal-body">
-                            <div class="visual-terminal-command">$ focal-agent inventory --json</div>
+                            <div class="visual-terminal-command">&gt; focal-agent-inventory.exe inventory.collect</div>
                             <div class="visual-terminal-json">
-                                <div><span class="json-key">hostname</span><span class="json-sep">:</span> <span class="json-string">"workstation-01"</span></div>
-                                <div><span class="json-key">os</span><span class="json-sep">:</span> <span class="json-string">"linux"</span></div>
-                                <div><span class="json-key">services</span><span class="json-sep">:</span> <span class="json-number">24</span></div>
-                                <div><span class="json-key">network</span><span class="json-sep">:</span> <span class="json-brace">&#123;</span></div>
-                                <div class="json-indent"><span class="json-key">ip</span><span class="json-sep">:</span> <span class="json-string">"192.168.1.42"</span></div>
+                                <div><span class="json-key">hostname</span><span class="json-sep">:</span> <span class="json-string">"DESKTOP-12345"</span></div>
+                                <div><span class="json-key">os</span><span class="json-sep">:</span> <span class="json-string">"Windows 11"</span></div>
+                                <div><span class="json-key">arch</span><span class="json-sep">:</span> <span class="json-string">"amd64"</span></div>
+                                <div><span class="json-key">cpu_count</span><span class="json-sep">:</span> <span class="json-number">32</span></div>
+                                <div class="json-indent"><span class="json-key">memory_total_gb</span><span class="json-sep">:</span> <span class="json-number">64</span></div>
                                 <div><span class="json-brace">&#125;</span></div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
 
             <p>
-                Cross-platform inventory plugin that gathers hardware, operating
-                system, network, service, and storage information.
+                Read-only Windows plugin that gives Focal Agent structured system,
+                disk, network, process, and service inventory over JSON.
             </p>
 
-            <p><strong>Technologies:</strong> Go</p>
+            <p><strong>Technologies:</strong> Go, gopsutil, Windows SCM, JSON</p>
 
-            <a class="button" href="https://github.com/sjweiler/focal-agent-inventory-plugin">GitHub</a>
+            <div class="actions">
+                <a class="button" href="/focal-agent-inventory/">Read case study</a>
+                <a class="button secondary" href="https://github.com/sjweiler/focal-agent-inventory-plugin">GitHub</a>
+            </div>
         </article>
 
         <article class="card project-card">

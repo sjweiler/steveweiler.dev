@@ -1,0 +1,337 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Focal Agent Inventory Plugin Case Study | Steve Weiler"
+  description="A case study of Steve Weiler's read-only Go inventory plugin for Focal Agent, using JSON over standard input and output to inspect Windows systems."
+>
+  <main class="site-main case-study">
+    <section class="case-study-hero">
+      <div class="case-study-intro">
+        <p class="eyebrow">Project case study</p>
+        <div class="status-line">
+          <span class="status-badge">Alpha · Active development</span>
+          <span>Go · Windows · JSON · gopsutil · Windows SCM</span>
+        </div>
+        <h1>Focal Agent Inventory Plugin</h1>
+        <p class="case-study-lede">
+          A small, read-only system inventory process that gives Focal Agent
+          structured Windows context without embedding platform-specific
+          inspection code—or mutation authority—inside the AI host.
+        </p>
+        <div class="actions">
+          <a class="button" href="https://github.com/sjweiler/focal-agent-inventory-plugin">View source on GitHub</a>
+          <a class="button secondary" href="#architecture">Explore the plugin boundary</a>
+        </div>
+      </div>
+
+      <figure class="case-study-hero-media inventory-case-figure">
+        <div class="visual-terminal inventory-case-terminal" role="img" aria-label="Terminal showing Focal Agent sending an inventory.collect JSON request to the Go plugin and receiving a successful structured Windows inventory response">
+          <div class="visual-terminal-shell">
+            <div class="visual-terminal-top">
+              <span class="visual-terminal-dot dot-red"></span>
+              <span class="visual-terminal-dot dot-yellow"></span>
+              <span class="visual-terminal-dot dot-green"></span>
+              <span class="visual-terminal-title">focal-agent-inventory.exe</span>
+              <span class="visual-terminal-badge">Read only</span>
+            </div>
+            <div class="visual-terminal-body">
+              <div class="visual-terminal-command">&gt; echo {`{"method":"inventory.collect"}`} | focal-agent-inventory.exe</div>
+              <div class="visual-terminal-json">
+                <div><span class="json-brace">{`{`}</span></div>
+                <div class="json-indent"><span class="json-key">"success"</span><span class="json-sep">:</span> <span class="json-number">true</span>,</div>
+                <div class="json-indent"><span class="json-key">"data"</span><span class="json-sep">:</span> <span class="json-brace">{`{`}</span></div>
+                <div class="json-indent inventory-json-deep"><span class="json-key">"hostname"</span><span class="json-sep">:</span> <span class="json-string">"DESKTOP-12345"</span>,</div>
+                <div class="json-indent inventory-json-deep"><span class="json-key">"os"</span><span class="json-sep">:</span> <span class="json-string">"Microsoft Windows 11"</span>,</div>
+                <div class="json-indent inventory-json-deep"><span class="json-key">"arch"</span><span class="json-sep">:</span> <span class="json-string">"amd64"</span>,</div>
+                <div class="json-indent inventory-json-deep"><span class="json-key">"cpu_count"</span><span class="json-sep">:</span> <span class="json-number">32</span></div>
+                <div class="json-indent"><span class="json-brace">{`}`}</span></div>
+                <div><span class="json-brace">{`}`}</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <figcaption>One request enters over stdin; one typed JSON response leaves over stdout.</figcaption>
+      </figure>
+    </section>
+
+    <section class="case-study-summary" aria-label="Project summary">
+      <article class="case-stat">
+        <span class="case-stat-label">Role</span>
+        <strong>Creator and developer</strong>
+        <p>Plugin boundary, Go implementation, Windows collectors, protocol design, documentation, and delivery setup.</p>
+      </article>
+      <article class="case-stat">
+        <span class="case-stat-label">Scope</span>
+        <strong>Five inventory commands</strong>
+        <p>System summary, disks, network interfaces, running processes, and Windows services.</p>
+      </article>
+      <article class="case-stat">
+        <span class="case-stat-label">Current state</span>
+        <strong>Windows alpha</strong>
+        <p>The core collectors and JSON dispatch path exist; broader platform support, protocol evolution, tests, and documentation remain future work.</p>
+      </article>
+    </section>
+
+    <section class="case-study-section split-section">
+      <div>
+        <p class="eyebrow">The challenge</p>
+        <h2>Give an AI agent system context without giving it a system shell.</h2>
+      </div>
+      <div class="prose">
+        <p>
+          Useful desktop assistance depends on facts: operating-system version,
+          available memory, mounted storage, network adapters, active processes,
+          and service state. Building each platform query directly into the host
+          would couple Focal Agent to Windows APIs and expand the trusted codebase.
+        </p>
+        <p>
+          The inventory plugin moves that knowledge behind a process boundary.
+          Focal Agent asks for one named operation, the Go executable gathers
+          local facts through focused collectors, and the result returns as a
+          language-neutral JSON envelope. No command mutates the machine.
+        </p>
+      </div>
+    </section>
+
+    <section class="case-study-section" id="architecture">
+      <div class="section-heading case-heading">
+        <p class="eyebrow">System design</p>
+        <h2>A language-independent plugin contract over ordinary process I/O.</h2>
+        <p>
+          The integration uses mechanisms every host language already understands:
+          launch a child process, write JSON to standard input, and decode JSON
+          from standard output. Platform code stays inside a disposable executable.
+        </p>
+      </div>
+
+      <div class="control-architecture card" role="img" aria-label="Focal Agent Inventory Plugin architecture: Focal Agent launches an external process and sends a named JSON request over standard input; a Go dispatcher selects a read-only Windows collector; the plugin returns a success or error envelope over standard output">
+        <div class="control-node">
+          <span>Host</span>
+          <strong>Focal Agent</strong>
+          <small>Launch and supervise plugin</small>
+        </div>
+        <div class="control-link">
+          <strong>JSON request</strong>
+          <span>stdin</span>
+        </div>
+        <div class="control-node control-node--boundary">
+          <span>Plugin boundary</span>
+          <strong>Go dispatcher</strong>
+          <small>Route one named method</small>
+        </div>
+        <div class="control-link">
+          <strong>Read-only call</strong>
+          <span>Windows</span>
+        </div>
+        <div class="control-node">
+          <span>Collectors</span>
+          <strong>System APIs</strong>
+          <small>Facts → JSON response</small>
+        </div>
+      </div>
+
+      <div class="decision-grid">
+        <article class="card decision-card">
+          <span class="decision-number">01 · Isolation</span>
+          <h3>Run out of process</h3>
+          <p>Collector failures and platform dependencies remain outside the Focal Agent runtime and can be upgraded independently.</p>
+        </article>
+        <article class="card decision-card">
+          <span class="decision-number">02 · Interoperability</span>
+          <h3>Use JSON over stdin/stdout</h3>
+          <p>The protocol does not require a language-specific SDK, network listener, service registration, or shared library ABI.</p>
+        </article>
+        <article class="card decision-card">
+          <span class="decision-number">03 · Authority</span>
+          <h3>Keep every operation read only</h3>
+          <p>The implemented dispatch table contains inventory queries—not process termination, service changes, disk writes, or shell execution.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="case-study-section" id="foundations">
+      <div class="section-heading case-heading">
+        <p class="eyebrow">Engineering decisions</p>
+        <h2>Choose simple boundaries that can grow without hiding authority.</h2>
+        <p>
+          The alpha implementation is compact by design. The host sees named
+          capabilities, collectors own platform details, and every invocation
+          produces a uniform success or error response.
+        </p>
+      </div>
+
+      <div class="foundation-grid">
+        <article class="card foundation-card">
+          <span class="decision-number">01 · Implementation</span>
+          <h3>Go for a small native executable</h3>
+          <dl class="decision-rationale">
+            <div><dt>Constraint</dt><dd>The plugin should start quickly, ship without a separate runtime, and call operating-system APIs predictably.</dd></div>
+            <div><dt>Decision</dt><dd>Compile collectors and protocol handling into one Go executable that Focal Agent can launch on demand.</dd></div>
+            <div><dt>Tradeoff</dt><dd>Platform-specific files and build targets require deliberate CI coverage, but distribution stays straightforward.</dd></div>
+          </dl>
+        </article>
+
+        <article class="card foundation-card">
+          <span class="decision-number">02 · Collection</span>
+          <h3>gopsutil for common inventory</h3>
+          <dl class="decision-rationale">
+            <div><dt>Constraint</dt><dd>CPU, memory, host, disk, interface, and process data involve different native Windows mechanisms.</dd></div>
+            <div><dt>Decision</dt><dd>Use gopsutil to normalize those queries into Go values before producing the external JSON shape.</dd></div>
+            <div><dt>Tradeoff</dt><dd>The dependency simplifies collection but its raw platform values still require stable schema and error-policy decisions.</dd></div>
+          </dl>
+        </article>
+
+        <article class="card foundation-card">
+          <span class="decision-number">03 · Services</span>
+          <h3>Use the native Windows service manager</h3>
+          <dl class="decision-rationale">
+            <div><dt>Constraint</dt><dd>Service inventory needs authoritative state from the Windows Service Control Manager.</dd></div>
+            <div><dt>Decision</dt><dd>Connect through <code>x/sys/windows/svc/mgr</code>, query each accessible service, and map native states to stable strings.</dd></div>
+            <div><dt>Tradeoff</dt><dd>Inaccessible services are skipped, so callers receive usable partial inventory rather than an all-or-nothing failure.</dd></div>
+          </dl>
+        </article>
+
+        <article class="card foundation-card">
+          <span class="decision-number">04 · Response contract</span>
+          <h3>One envelope for success and failure</h3>
+          <dl class="decision-rationale">
+            <div><dt>Constraint</dt><dd>The host needs to distinguish collector output from protocol or platform failures without parsing human console text.</dd></div>
+            <div><dt>Decision</dt><dd>Return a JSON object containing <code>success</code> plus either structured <code>data</code> or an <code>error</code> string.</dd></div>
+            <div><dt>Tradeoff</dt><dd>The current envelope is intentionally small; typed error codes and protocol-version negotiation remain roadmap work.</dd></div>
+          </dl>
+        </article>
+      </div>
+    </section>
+
+    <section class="case-study-section engineering-section">
+      <div class="engineering-copy">
+        <p class="eyebrow">Engineering deep dive</p>
+        <h2>Each method reveals one bounded slice of the machine.</h2>
+        <p>
+          The dispatcher is an explicit allowlist. A request can arrive as a JSON
+          object on stdin or as a method name argument, but both paths resolve to
+          the same five cases. Unknown methods return a structured error rather
+          than falling through to command execution.
+        </p>
+        <p>
+          Collectors handle partial access pragmatically. Disk entries whose
+          usage cannot be queried, service handles that cannot be opened, and
+          individual process fields that cannot be read do not prevent the rest
+          of the inventory from being returned.
+        </p>
+      </div>
+      <div class="tradeoff-list" aria-label="Inventory command surface">
+        <article class="tradeoff-item">
+          <span>System</span>
+          <h3><code>inventory.collect</code></h3>
+          <p>Hostname, Windows platform and version, kernel, architecture, CPU model/count, and total/available memory.</p>
+        </article>
+        <article class="tradeoff-item">
+          <span>Storage and network</span>
+          <h3><code>disks.list</code> · <code>network.list</code></h3>
+          <p>Mounted partitions and usage plus interface names, MAC addresses, assigned addresses, and flags.</p>
+        </article>
+        <article class="tradeoff-item">
+          <span>Runtime</span>
+          <h3><code>processes.list</code></h3>
+          <p>Process IDs, names, users, CPU percentage, and memory percentage where Windows permits inspection.</p>
+        </article>
+        <article class="tradeoff-item">
+          <span>Services</span>
+          <h3><code>services.list</code></h3>
+          <p>Service names and normalized stopped, pending, running, or paused states from the Windows SCM.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="case-study-section evidence-section">
+      <div class="section-heading case-heading">
+        <p class="eyebrow">Repository evidence · August 2026</p>
+        <h2>The implemented surface is compact and inspectable.</h2>
+        <p>
+          These figures come from the current public <code>main</code> branch.
+          They distinguish shipped alpha behavior from the broader cross-platform
+          roadmap described in the README.
+        </p>
+      </div>
+      <div class="evidence-grid">
+        <article class="evidence-card">
+          <strong>5</strong>
+          <span>Implemented methods</span>
+          <p>Every accepted operation appears in one explicit dispatch switch.</p>
+        </article>
+        <article class="evidence-card">
+          <strong>4</strong>
+          <span>Focused collector modules</span>
+          <p>Disk, network, process, and service collectors complement the complete system summary.</p>
+        </article>
+        <article class="evidence-card">
+          <strong>7</strong>
+          <span>Normalized service states</span>
+          <p>Native SCM states map to stable JSON strings, with an explicit unknown fallback.</p>
+        </article>
+        <article class="evidence-card">
+          <strong>2</strong>
+          <span>Request entry modes</span>
+          <p>Focal Agent can provide a JSON stdin envelope; developers can invoke a method directly by argument.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="case-study-section status-section">
+      <div>
+        <p class="eyebrow">Where it stands</p>
+        <h2>A useful Windows proof of the plugin model, deliberately labeled alpha.</h2>
+        <p>
+          The repository demonstrates the process and capability boundary with
+          working Windows collectors. It is not yet a production-grade,
+          cross-platform inventory subsystem, and the portfolio should make that
+          distinction visible.
+        </p>
+      </div>
+      <div class="status-columns">
+        <div>
+          <h3>Implemented</h3>
+          <ul class="feature-list">
+            <li>JSON request and response envelopes</li>
+            <li>Explicit five-method dispatch allowlist</li>
+            <li>Windows host, CPU, memory, and OS inventory</li>
+            <li>Disk and network interface enumeration</li>
+            <li>Process resource summaries</li>
+            <li>Windows service names and lifecycle states</li>
+            <li>Structured errors for decoding, collection, and unknown methods</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Next hardening steps</h3>
+          <ul class="feature-list">
+            <li>Automated tests for dispatch and collector schemas</li>
+            <li>Windows-target CI and clean CodeQL configuration</li>
+            <li>Populate the scaffolded architecture, protocol, security, and command documentation</li>
+            <li>Protocol version negotiation and typed errors</li>
+            <li>Field limits, timeouts, cancellation, and output-size budgets</li>
+            <li>Linux and macOS collector implementations</li>
+            <li>Installed software, GPU, update, sensor, and security inventory</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="card case-study-links">
+      <div>
+        <p class="eyebrow">Go deeper</p>
+        <h2>Inspect the current plugin contract and collectors.</h2>
+        <p>The public repository shows the alpha implementation directly; roadmap items are documented separately in the README.</p>
+      </div>
+      <div class="doc-links">
+        <a href="https://github.com/sjweiler/focal-agent-inventory-plugin">Repository <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/sjweiler/focal-agent-inventory-plugin/blob/main/README.md">Capabilities and roadmap <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/sjweiler/focal-agent-inventory-plugin/blob/main/main.go">Request dispatch <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/sjweiler/focal-agent-inventory-plugin/blob/main/protocol.go">JSON protocol <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/sjweiler/focal-agent-inventory-plugin/blob/main/services_windows.go">Windows service collector <span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+  </main>
+</BaseLayout>

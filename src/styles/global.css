@@ -1146,6 +1146,43 @@ figure figcaption {
   font-size: 0.78rem;
 }
 
+.inventory-case-figure {
+  overflow: hidden;
+  border: 1px solid rgba(94, 234, 212, 0.2);
+  border-radius: 24px;
+  background: rgba(7, 17, 29, 0.72);
+  box-shadow: 0 30px 70px rgba(2, 6, 23, 0.62);
+}
+
+.inventory-case-terminal {
+  padding: clamp(18px, 4vw, 42px);
+  background:
+    radial-gradient(circle at top left, rgba(45, 212, 191, 0.12), transparent 34%),
+    linear-gradient(135deg, #0a1826, #070d18);
+}
+
+.inventory-case-terminal .visual-terminal-shell {
+  width: min(860px, 100%);
+  margin: 0 auto;
+}
+
+.inventory-case-terminal .visual-terminal-body {
+  padding: clamp(18px, 4vw, 34px);
+}
+
+.inventory-case-terminal .visual-terminal-command,
+.inventory-case-terminal .visual-terminal-json {
+  font-size: clamp(0.72rem, 1.6vw, 0.95rem);
+}
+
+.inventory-json-deep {
+  padding-left: 40px;
+}
+
+.inventory-case-figure > figcaption {
+  padding: 14px 18px 18px;
+}
+
 .case-study-summary {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
