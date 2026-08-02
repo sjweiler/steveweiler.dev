@@ -1,0 +1,117 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Infrastructure | Steve Weiler"
+  description="Enterprise systems, virtualization, networking, monitoring, and infrastructure automation experience from Steve Weiler."
+>
+  <main>
+    <section class="page-header">
+      <h1>Infrastructure</h1>
+      <p>
+        More than 25 years of experience supporting the systems, networks, and
+        operational tooling that keep organizations running.
+      </p>
+    </section>
+
+    <article class="card project-card">
+      <div class="project-header">
+        <div class="project-badge">IO</div>
+        <div>
+          <h2>Infrastructure operations</h2>
+          <p class="project-kicker">Reliable systems from server to service</p>
+        </div>
+      </div>
+
+      <div class="project-visual project-visual--infra infrastructure-visual">
+        <img
+          class="project-visual-image project-visual-image--contain"
+          src="/images/infrastructure-admin-graphic.png"
+          alt="Servers connected to a router, switch, firewall, and monitoring dashboard"
+        >
+      </div>
+
+      <p>
+        Hands-on administration across Windows and Linux environments, combining
+        day-to-day support with long-term planning, systems integration, and
+        practical automation.
+      </p>
+    </article>
+
+    <section class="cards" aria-label="Infrastructure capabilities">
+      <article class="card project-card">
+        <div class="project-header">
+          <div class="project-badge">SE</div>
+          <div>
+            <h2>Systems engineering</h2>
+            <p class="project-kicker">Windows and Linux</p>
+          </div>
+        </div>
+
+        <p>
+          Administration and support for enterprise server environments, identity,
+          access, core services, and business-critical applications.
+        </p>
+
+        <p><strong>Technologies:</strong> Windows Server, Linux, Active Directory</p>
+      </article>
+
+      <article class="card project-card">
+        <div class="project-header">
+          <div class="project-badge">VN</div>
+          <div>
+            <h2>Virtualization &amp; networking</h2>
+            <p class="project-kicker">Platforms and connectivity</p>
+          </div>
+        </div>
+
+        <p>
+          Virtual infrastructure and network operations focused on stable services,
+          clear dependencies, and dependable access for users and applications.
+        </p>
+
+        <p><strong>Technologies:</strong> VMware, TCP/IP, routing, switching</p>
+      </article>
+
+      <article class="card project-card">
+        <div class="project-header">
+          <div class="project-badge">MA</div>
+          <div>
+            <h2>Monitoring &amp; automation</h2>
+            <p class="project-kicker">Visibility and repeatability</p>
+          </div>
+        </div>
+
+        <p>
+          Monitoring, diagnostics, and automation that make infrastructure easier
+          to understand, maintain, and support through operational change.
+        </p>
+
+        <p><strong>Technologies:</strong> OpenNMS, scripting, systems integration</p>
+      </article>
+    </section>
+
+    <section class="card cta-strip">
+      <div>
+        <p class="eyebrow">Infrastructure experience</p>
+        <h2>Built around reliability, clarity, and practical support.</h2>
+        <p>
+          See the full work history and certifications, or get in touch to discuss
+          infrastructure and systems engineering.
+        </p>
+      </div>
+      <div class="actions">
+        <a class="button" href="/resume/">View Resume</a>
+        <a class="button secondary" href="/contact/">Contact Me</a>
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .infrastructure-visual {
+    aspect-ratio: 3 / 2;
+    min-height: 0;
+  }
+</style>
