@@ -1,0 +1,321 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Fast by Layers: Optimizing FocalVector | Steve Weiler"
+  description="How FocalVector combines HNSW, scalar-int8 quantization, AVX2 SIMD, deterministic parallel builds, memory mapping, and optional CUDA exact search without weakening result correctness."
+>
+  <main class="article-page">
+    <article>
+      <header class="article-hero">
+        <a class="article-back" href="/engineering/"><span aria-hidden="true">←</span> Engineering</a>
+        <p class="eyebrow">Performance · FocalVector</p>
+        <h1>Fast by layers.</h1>
+        <p class="article-lede">
+          FocalVector became fast through a sequence of optimizations—HNSW,
+          quantization, SIMD, parallel construction, memory mapping, incremental
+          persistence, and optional CUDA. The harder part was making sure every
+          faster path still answered the same question.
+        </p>
+        <div class="article-byline">
+          <span>By Steve Weiler</span>
+          <time datetime="2026-08-02">August 2, 2026</time>
+          <span>10 minute read</span>
+        </div>
+      </header>
+
+      <figure class="optimization-hero" aria-labelledby="optimization-caption">
+        <div class="optimization-flow" role="img" aria-label="FocalVector optimization stack: exact search establishes ground truth; HNSW reduces candidates; scalar-int8 and AVX2 accelerate traversal; full-precision reranking restores precise scores; optional CUDA performs exact unfiltered scoring">
+          <div class="optimization-stage optimization-stage--oracle">
+            <span>Correctness</span><strong>Exact CPU oracle</strong><small>ground truth · filtered fallback</small>
+          </div>
+          <span class="optimization-arrow" aria-hidden="true">→</span>
+          <div class="optimization-stage">
+            <span>Less work</span><strong>HNSW</strong><small>candidate traversal</small>
+          </div>
+          <span class="optimization-arrow" aria-hidden="true">→</span>
+          <div class="optimization-stage">
+            <span>Cheaper work</span><strong>int8 + AVX2</strong><small>quantized scoring</small>
+          </div>
+          <span class="optimization-arrow" aria-hidden="true">→</span>
+          <div class="optimization-stage optimization-stage--result">
+            <span>Precise result</span><strong>f32 rerank</strong><small>authoritative vectors</small>
+          </div>
+          <div class="optimization-cuda"><span>Optional exact path</span><strong>CUDA · cuBLAS GEMV</strong></div>
+        </div>
+        <figcaption id="optimization-caption">Acceleration is layered around an exact reference path rather than substituted for it.</figcaption>
+      </figure>
+
+      <div class="article-body">
+        <p class="article-opening">
+          “Make vector search faster” sounds like one task. In practice it is a
+          stack of different problems: examine fewer vectors, make each comparison
+          cheaper, keep data close to the CPU, avoid rebuilding unchanged work, and
+          use parallel hardware where its overhead is justified.
+        </p>
+
+        <p>
+          Each optimization also introduces a new way to be wrong. Approximate
+          traversal can miss neighbors. Quantization changes scores. Parallel graph
+          construction can become nondeterministic. A GPU cache can be stale while
+          writes continue on the CPU. Even a faster query is a regression if it
+          silently returns worse results.
+        </p>
+
+        <p>
+          I designed FocalVector around that tension. Exact search remains the
+          correctness oracle. Benchmarks measure recall against it, durable APIs
+          rerank with authoritative full-precision vectors, and accelerated state
+          remains rebuildable. That gives every optimization a reference answer and
+          a clear failure boundary.
+        </p>
+
+        <aside class="article-callout">
+          <span>The performance rule</span>
+          <p>An optimization is only a win when its cost, recall, and failure behavior are all visible.</p>
+        </aside>
+
+        <h2 id="hnsw">First, avoid most comparisons.</h2>
+
+        <p>
+          Exact search scores every eligible vector. It is simple, deterministic,
+          and indispensable for validation, but its work grows linearly with the
+          collection. FocalVector’s primary approximate index is HNSW: a layered
+          proximity graph that navigates toward promising regions instead of
+          scanning the full corpus.
+        </p>
+
+        <p>
+          There is no single “HNSW speed.” Graph density (<code>M</code>), build
+          breadth (<code>ef_construction</code>), and query breadth
+          (<code>ef_search</code>) spend memory and computation at different times.
+          On a deterministic one-million-vector, 128-dimensional cosine corpus, a
+          high-recall graph built with <code>M=32</code> and
+          <code>ef_construction=400</code> reached 96.0% recall@10 at a mean 2.430 ms
+          with <code>ef_search=384</code>. Raising query breadth to 768 reached 97.7%
+          at 4.827 ms. The curve matters more than either endpoint.
+        </p>
+
+        <p>
+          An important lesson from that benchmark was that query effort cannot
+          recover information the graph never captured. A faster-to-build
+          <code>M=16</code> graph reached only 85.7% recall even at
+          <code>ef_search=1536</code>. Construction quality, resident memory, and
+          query latency are one coupled decision.
+        </p>
+
+        <h2 id="quantization">Then, make graph traversal cheaper.</h2>
+
+        <p>
+          HNSW reduces the number of candidates, but graph traversal still performs
+          many vector comparisons. Storing every traversal vector as
+          <code>f32</code> costs four bytes per component and moves correspondingly
+          more data through the cache hierarchy. FocalVector’s durable indexes use
+          symmetric scalar-int8 quantization: one signed byte per component, plus a
+          per-vector scale and cached squared norm.
+        </p>
+
+        <p>
+          Quantization is used to navigate, not to define the final answer. A query
+          traverses the graph with quantized cosine, dot-product, or Euclidean
+          scores, oversamples four times the requested result count, then reranks
+          those candidates against the authoritative full-precision vectors.
+          Filtered exact search and the recent-write delta remain full precision as
+          well. Returned durable-API scores therefore retain <code>f32</code>
+          semantics even though the fast path used approximate arithmetic to find
+          candidates.
+        </p>
+      </div>
+
+      <section class="benchmark-panel" aria-labelledby="quantized-results-title">
+        <div class="benchmark-panel-heading">
+          <p class="eyebrow">Measured on an i9-13900K · direct HNSW</p>
+          <h2 id="quantized-results-title">Quantization improved more than memory.</h2>
+          <p>Release-mode synthetic benchmarks at <code>ef_search=384</code>. Recall shown here is before the durable API’s four-times full-precision rerank.</p>
+        </div>
+        <div class="benchmark-table-wrap">
+          <table class="benchmark-table">
+            <thead><tr><th>Corpus</th><th>Storage</th><th>Arena</th><th>Build</th><th>Query</th><th>Recall@10</th></tr></thead>
+            <tbody>
+              <tr><td>100k × 128</td><td><code>f32</code></td><td>51.2 MB</td><td>6.96 s</td><td>1.077 ms</td><td>96.3%</td></tr>
+              <tr class="benchmark-highlight"><td>100k × 128</td><td>scalar-int8</td><td>13.6 MB</td><td>3.47 s</td><td>0.316 ms</td><td>95.1%</td></tr>
+              <tr><td>50k × 768</td><td><code>f32</code></td><td>153.6 MB</td><td>16.03 s</td><td>3.167 ms</td><td>83.9%</td></tr>
+              <tr class="benchmark-highlight"><td>50k × 768</td><td>scalar-int8</td><td>38.8 MB</td><td>3.85 s</td><td>1.009 ms</td><td>83.3%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="benchmark-note">These are regression measurements from one development host and synthetic corpora, not universal performance claims.</p>
+      </section>
+
+      <div class="article-body">
+        <h2 id="simd">SIMD turns compact data into useful throughput.</h2>
+
+        <p>
+          The compact representation creates an opportunity for wider arithmetic.
+          On x86-64, FocalVector runtime-detects AVX2 and processes 16 signed-byte
+          component pairs at a time. It widens them to 16-bit lanes, multiplies and
+          accumulates into 32-bit lanes, then finishes any tail with the portable
+          implementation. The dispatch is guarded at runtime, so the persisted
+          format is not tied to one CPU instruction set.
+        </p>
+
+        <p>
+          Two details matter here. First, the accumulator path is bounded: vectors
+          above the safe AVX2 length use the checked portable implementation.
+          Second, tests compare the vectorized and portable results at boundary
+          lengths and extreme values. SIMD is an implementation choice, not a new
+          scoring definition.
+        </p>
+
+        <h2 id="locality">The quiet wins: locality and allocation control.</h2>
+
+        <p>
+          Arithmetic was only part of the cost. The original graph shape could also
+          lose time chasing allocations. FocalVector now stores vector components in
+          contiguous arenas. After construction, neighbor lists are flattened into
+          compact ranges over one <code>u32</code> link array, and point IDs live in
+          a single ordinal table instead of being duplicated in every graph node.
+        </p>
+
+        <p>
+          Graph traversal uses generation-marked visitation arrays rather than
+          allocating and hashing a fresh visited set for each search. Query
+          workspaces come from a bounded, contention-safe pool and return after use.
+          The same generation-marked workspaces are reused by construction workers.
+          None of these changes is as dramatic as “GPU acceleration,” but together
+          they reduce allocator traffic and give the CPU more predictable memory
+          access.
+        </p>
+
+        <h2 id="parallel-build">Parallelize construction without randomizing it.</h2>
+
+        <p>
+          HNSW insertion is order-sensitive, which makes naïve parallel construction
+          both difficult to reproduce and difficult to debug. FocalVector builds a
+          4,096-point seed graph serially, then plans groups of 512 insertions in
+          parallel against a stable graph snapshot. Plans are applied in input order.
+        </p>
+
+        <p>
+          Rayon supplies the worker pool, but scheduling does not decide the graph.
+          Stable input ordering, deterministic levels, stable score tie-breaking,
+          and ordered plan application produce the same graph across worker counts.
+          This preserves reproducible benchmarks and storage while using available
+          cores for the expensive planning phase.
+        </p>
+
+        <h2 id="persistence">Stop copying and rebuilding unchanged data.</h2>
+
+        <p>
+          Query speed can be undermined by what happens between queries. FocalVector
+          recovers immutable segments through read-only memory maps. Persisted int8
+          graph codes and aligned full-precision vectors are scored directly from
+          mapped files instead of being copied into second heap arenas. An owned
+          public point is materialized lazily only when an ID is explicitly fetched;
+          search and reranking stay zero-copy.
+        </p>
+
+        <p>
+          Writes use another form of work avoidance. Recent mutations remain in a
+          small exact-search delta and merge with results from immutable graphs.
+          Routine flushes build a new segment only for changed live IDs rather than
+          rebuilding the entire collection. In the repository benchmark, updating
+          1,000 points in a 100k × 128 collection produced a 0.83 MB segment instead
+          of 83.6 MB and reduced flush time from 8.73 seconds to 121.6 milliseconds.
+          Search fans out across at most eight segments; the next flush compacts
+          them into a new full graph.
+        </p>
+
+        <h2 id="filters">A filter should reduce work, not destroy recall.</h2>
+
+        <p>
+          Applying metadata filters after a small ANN result set is fast but wrong:
+          it can return fewer than <code>k</code> results even when enough qualifying
+          points exist. FocalVector builds equality and numeric-range indexes for
+          immutable snapshots, estimates selectivity, and chooses between exact
+          candidate scoring, filtered graph traversal, and broader HNSW search.
+        </p>
+
+        <p>
+          For selective filters, an indexed exact scan can be cheaper and more
+          reliable than graph traversal. For broad filters, HNSW remains useful as
+          long as traversal can expand when the filtered result set is too small.
+          The optimization is the plan choice—not a blanket assumption that ANN is
+          always faster.
+        </p>
+
+        <h2 id="cuda">CUDA is an optional exact query engine.</h2>
+
+        <p>
+          FocalVector can also keep an immutable full-precision matrix on an NVIDIA
+          GPU. For an unfiltered query, it uploads one vector and uses cuBLAS GEMV to
+          compute dot products against the snapshot. Cosine, dot-product, and
+          Euclidean scoring then follow the collection’s existing semantics.
+        </p>
+
+        <p>
+          This path is intentionally optional at two levels. CUDA support is a Cargo
+          feature with dynamically loaded CUDA 12 driver and cuBLAS libraries, so a
+          normal build has no CUDA dependency. At runtime, CUDA can be off, preferred
+          above a configurable collection-size threshold, or required. Preferred mode
+          falls back to CPU/HNSW when initialization fails or the collection is too
+          small to amortize device overhead.
+        </p>
+
+        <p>
+          The device matrix is a rebuildable cache, never durable state. After a
+          flush, FocalVector refreshes it from authoritative points. Mutations newer
+          than the GPU snapshot remain on the exact CPU delta path; dirty IDs are
+          excluded from device results and both candidate lists are merged. Filtered
+          searches continue through metadata planning and the CPU engine.
+        </p>
+
+        <p>
+          The current baseline still copies one score per snapshot vector back to
+          the host for deterministic top-k selection and full-precision reranking.
+          Device-side top-k reduction is the obvious next optimization for larger
+          collections. Memory is another honest constraint: one million
+          128-dimensional <code>f32</code> vectors occupy about 488 MiB of VRAM before
+          scores and cuBLAS workspaces. CUDA is a query option to benchmark, not a
+          badge that automatically makes every workload faster.
+        </p>
+
+        <blockquote>
+          HNSW avoids work. Quantization and SIMD cheapen work. Memory mapping avoids
+          duplicate work. CUDA moves exact work. The oracle decides whether any of it
+          was correct.
+        </blockquote>
+
+        <h2 id="lesson">The optimization stack is the product.</h2>
+
+        <p>
+          FocalVector’s fastest path is not one algorithm. It is coordination among
+          representations and execution engines: quantized graph traversal finds a
+          candidate set, full-precision vectors settle the ranking, metadata indexes
+          change the plan, a CPU delta preserves fresh writes, and an optional GPU
+          snapshot accelerates the cases that fit it.
+        </p>
+
+        <p>
+          That layering is what keeps the system understandable. Each fast path has
+          a workload where it wins, a boundary where it stops, and an exact path to
+          compare against. Performance engineering becomes a series of measurable,
+          reversible decisions instead of one irreversible bet.
+        </p>
+      </div>
+
+      <footer class="article-footer card">
+        <div>
+          <p class="eyebrow">Continue exploring</p>
+          <h2>See the complete database.</h2>
+          <p>The FocalVector case study covers durability, filtered search, sharding, OpenRaft replication, operational limits, and the wider architecture.</p>
+        </div>
+        <div class="actions">
+          <a class="button" href="/focalvector/">View the FocalVector case study</a>
+          <a class="button secondary" href="https://github.com/sjweiler/focal-vector">Browse the source</a>
+        </div>
+      </footer>
+    </article>
+  </main>
+</BaseLayout>

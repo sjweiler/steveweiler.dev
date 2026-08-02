@@ -13,28 +13,58 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       <p>Architecture, project deep dives, benchmarks, and practical software and systems engineering notes.</p>
     </section>
 
-    <section class="article-feature" aria-labelledby="focaldesk-article-title">
-      <a class="article-feature-media" href="/engineering/focaldesk-frame-loop/" tabindex="-1" aria-hidden="true">
-        <img src="/images/focaldesk/desktop.png" alt="" />
+    <section class="article-feature article-feature--vector" aria-labelledby="focalvector-article-title">
+      <a class="vector-article-visual" href="/engineering/focalvector-optimization-stack/" tabindex="-1" aria-hidden="true">
+        <span class="vector-visual-label">Query path</span>
+        <div class="vector-visual-stack">
+          <span>Exact oracle</span>
+          <span>HNSW</span>
+          <span>Scalar int8</span>
+          <span>AVX2</span>
+          <span>CUDA · cuBLAS</span>
+        </div>
+        <div class="vector-visual-result">
+          <strong>0.316 ms</strong>
+          <span>100k × 128 · ef 384</span>
+        </div>
       </a>
       <div class="article-feature-copy">
-        <p class="eyebrow">Architecture · FocalDesk</p>
-        <h2 id="focaldesk-article-title">
-          <a href="/engineering/focaldesk-frame-loop/">The frame loop is a boundary</a>
+        <p class="eyebrow">Performance · FocalVector</p>
+        <h2 id="focalvector-article-title">
+          <a href="/engineering/focalvector-optimization-stack/">Fast by layers</a>
         </h2>
         <p class="article-deck">
-          What building a Wayland desktop taught me about keeping the compositor
-          small, moving variable-latency work into services, and designing failure
-          as part of the user experience.
+          Quantization, SIMD, deterministic parallel construction, zero-copy
+          persistence, and optional CUDA search—without allowing optimization to
+          redefine the correct answer.
         </p>
+        <div class="article-meta">
+          <time datetime="2026-08-02">August 2, 2026</time>
+          <span>10 minute read</span>
+        </div>
+        <a class="article-read-link" href="/engineering/focalvector-optimization-stack/">
+          Read the optimization deep dive <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="article-archive" aria-labelledby="more-writing-title">
+      <div class="article-archive-heading">
+        <p class="eyebrow">From the archive</p>
+        <h2 id="more-writing-title">More engineering notes</h2>
+      </div>
+      <article class="article-archive-card">
+        <div>
+          <p class="eyebrow">Architecture · FocalDesk</p>
+          <h3><a href="/engineering/focaldesk-frame-loop/">The frame loop is a boundary</a></h3>
+          <p>Keeping a Wayland compositor responsive by moving variable-latency work behind explicit, recoverable service boundaries.</p>
+        </div>
         <div class="article-meta">
           <time datetime="2026-08-02">August 2, 2026</time>
           <span>7 minute read</span>
         </div>
-        <a class="article-read-link" href="/engineering/focaldesk-frame-loop/">
-          Read the engineering deep dive <span aria-hidden="true">→</span>
-        </a>
-      </div>
+        <a class="article-read-link" href="/engineering/focaldesk-frame-loop/">Read article <span aria-hidden="true">→</span></a>
+      </article>
     </section>
   </main>
 </BaseLayout>
