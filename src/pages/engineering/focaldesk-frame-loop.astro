@@ -1,0 +1,235 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="The Frame Loop Is a Boundary | Steve Weiler"
+  description="How FocalDesk keeps its Wayland compositor responsive by moving variable-latency work behind explicit, recoverable service boundaries."
+>
+  <main class="article-page">
+    <article>
+      <header class="article-hero">
+        <a class="article-back" href="/engineering/"><span aria-hidden="true">←</span> Engineering</a>
+        <p class="eyebrow">Architecture · FocalDesk</p>
+        <h1>The frame loop is a boundary.</h1>
+        <p class="article-lede">
+          Building a Wayland desktop forced me to decide what absolutely has to
+          live inside the compositor—and what must be allowed to fail somewhere
+          else. That boundary became the organizing principle for FocalDesk.
+        </p>
+        <div class="article-byline">
+          <span>By Steve Weiler</span>
+          <time datetime="2026-08-02">August 2, 2026</time>
+          <span>7 minute read</span>
+        </div>
+      </header>
+
+      <figure class="article-hero-image">
+        <img src="/images/focaldesk/desktop.png" alt="The FocalDesk desktop session with its top bar, side rail, and application windows" />
+        <figcaption>FocalDesk running as a complete desktop session, not just a compositor demonstration.</figcaption>
+      </figure>
+
+      <div class="article-body">
+        <p class="article-opening">
+          A compositor sits at the center of a Wayland session. It receives input,
+          decides where surfaces belong, coordinates frames, and presents pixels to
+          displays. That centrality creates a dangerous temptation: when the desktop
+          needs one more capability, the compositor is the easiest place to put it.
+        </p>
+
+        <p>
+          Application launching? Add it to the compositor. Notifications? The
+          compositor already draws the shell. Power controls, settings, screen
+          capture, dialogs, model requests? They all need to interact with the
+          session, so pulling them inward can feel efficient.
+        </p>
+
+        <p>
+          It is efficient—until one slow operation becomes a dropped frame, one
+          blocked request freezes input, or one recoverable service bug takes down
+          the entire desktop. FocalDesk began as an experiment in building a Rust
+          compositor with Smithay. It became a deeper exercise in deciding which
+          responsibilities deserve to share a failure domain.
+        </p>
+
+        <aside class="article-callout">
+          <span>The core rule</span>
+          <p>If work can wait on a process, device, network, model, or person, it should not own the frame loop.</p>
+        </aside>
+
+        <h2 id="compositor-is-not-desktop">The compositor is critical. It is not the whole desktop.</h2>
+
+        <p>
+          The frame loop has a simple but unforgiving job: remain responsive. Its
+          responsibilities include surfaces, focus, workspaces, input routing,
+          output state, shell geometry, rendering, and frame coordination. These
+          concerns share tight timing and state relationships, so keeping them
+          together is useful.
+        </p>
+
+        <p>
+          Most desktop features have a different operational shape. Launching an
+          application may touch the filesystem and parse desktop entries. A power
+          action crosses a privileged system boundary. A notification can arrive
+          while its client is disappearing. An AI request can take seconds and may
+          need explicit approval before it does anything at all.
+        </p>
+
+        <p>
+          Those operations do not become predictable merely because they are called
+          from predictable code. The architecture has to acknowledge their latency
+          and failure modes. In FocalDesk, supporting capabilities run as separate
+          user services and communicate through typed IPC. The compositor remains
+          the authority for session state, but it does not have to perform every
+          piece of work itself.
+        </p>
+      </div>
+
+      <figure class="article-diagram">
+        <img src="/images/focaldesk/architecture-overview-v2.svg" alt="FocalDesk architecture showing applications, the compositor and renderer, hardware backends, and out-of-process services connected through typed IPC" />
+        <figcaption>The boundary follows timing and failure behavior, not an arbitrary split between “core” and “features.”</figcaption>
+      </figure>
+
+      <div class="article-body">
+        <h2 id="contracts">A process boundary is only as good as its contract.</h2>
+
+        <p>
+          Splitting a system into processes does not automatically make it robust.
+          It exchanges local complexity for distributed-systems complexity: message
+          versioning, timeouts, partial failure, startup order, stale state, service
+          discovery, and observability all become explicit engineering work.
+        </p>
+
+        <p>
+          That trade is worthwhile when the boundary reflects a real difference in
+          ownership or failure behavior. FocalDesk uses request, response, and event
+          contracts so callers can distinguish “accepted,” “completed,” “denied,”
+          and “unavailable” instead of assuming that sending a message means the job
+          is done. Services can restart independently; callers must be prepared for
+          them not to exist yet—or to disappear mid-operation.
+        </p>
+
+        <div class="article-principles" aria-label="Service boundary principles">
+          <section>
+            <span>01</span>
+            <h3>State has an owner</h3>
+            <p>Each fact has one authoritative home. Other processes receive snapshots or events, not shared mutable state.</p>
+          </section>
+          <section>
+            <span>02</span>
+            <h3>Failure is a response</h3>
+            <p>Unavailable and denied are normal outcomes that the interface must represent, log, and recover from.</p>
+          </section>
+          <section>
+            <span>03</span>
+            <h3>Latency is visible</h3>
+            <p>A request that can take time is modeled as asynchronous work, never disguised as a quick local call.</p>
+          </section>
+        </div>
+
+        <h2 id="permissions">Permissions belong in the interaction, not in a policy file.</h2>
+
+        <p>
+          AI integration made the architecture’s consequences especially clear.
+          Generating text is one category of operation. Opening an application,
+          reading a file, changing a setting, or controlling the session is another.
+          A desktop should not collapse those categories into one blanket grant.
+        </p>
+
+        <p>
+          FocalDesk routes action requests through a native permission path. The
+          request stops, the desktop shows what is being requested, and a person can
+          approve or deny it before execution continues. The permission decision is
+          part of the protocol, not a decorative prompt layered over an action that
+          has already begun.
+        </p>
+      </div>
+
+      <figure class="article-inline-image">
+        <img src="/images/focaldesk/ai-permission.png" loading="lazy" alt="FocalDesk AI Console displaying a native permission request before an action proceeds" />
+        <figcaption>A model request pauses at a desktop-owned permission boundary.</figcaption>
+      </figure>
+
+      <div class="article-body">
+        <h2 id="technology">Technology choices follow the boundary.</h2>
+
+        <p>
+          Rust, Smithay, and OpenGL ES are important parts of FocalDesk, but none of
+          them is the architecture by itself. I chose Smithay because it provides
+          Rust-native Wayland building blocks without prescribing the desktop
+          around them. Rust’s ownership and concurrency rules help enforce
+          invariants in session-critical code. OpenGL ES supplies the rendering
+          capabilities this compositor needs without taking on Vulkan’s explicit
+          resource and synchronization surface.
+        </p>
+
+        <p>
+          Each choice is intentionally bounded. Rust can prevent broad classes of
+          memory errors, but it cannot decide who owns a piece of distributed state.
+          IPC can isolate a crash, but it cannot invent a recovery strategy. A fast
+          renderer cannot compensate for blocking work in the input path. The design
+          still has to make the system’s promises clear.
+        </p>
+
+        <h2 id="result">What the boundary buys—and what it costs.</h2>
+
+        <p>
+          The immediate benefit is a smaller critical core. Supporting services can
+          evolve, restart, and fail without automatically ending the graphical
+          session. The same seams also make the desktop easier to inspect: service
+          health, messages, permissions, and state transitions are things the system
+          can expose instead of hiding them inside one process.
+        </p>
+
+        <p>
+          The cost is rigor. There are more lifecycle states to test, more contracts
+          to document, and more degraded modes to design. Startup and shutdown need
+          orchestration. Logs need enough context to connect events across process
+          boundaries. Compatibility changes must be deliberate.
+        </p>
+
+        <p>
+          For FocalDesk, that is the right complexity to own. A desktop session is a
+          long-running system that mediates between hardware, applications, services,
+          and a person. Pretending those pieces fail together cleanly would make the
+          implementation simpler only on paper.
+        </p>
+
+        <blockquote>
+          The goal is not the fewest processes. It is the smallest failure domain
+          that still preserves coherent ownership.
+        </blockquote>
+
+        <h2 id="next">A working rule for systems beyond the desktop.</h2>
+
+        <p>
+          The frame loop is specific to a compositor, but the design question is
+          general: what part of your system carries the promise users notice first?
+          It may be an event loop, an API request path, a control plane, or a storage
+          transaction. Protect that path from work with unrelated latency and failure
+          behavior. Give the displaced work a real contract, a clear owner, and an
+          honest degraded mode.
+        </p>
+
+        <p>
+          FocalDesk is still alpha software. Some services and first-party
+          applications are prototypes, and several APIs are evolving. But the system
+          is far enough along to validate the architectural bet: a desktop can feel
+          like one cohesive product without being one indivisible process.
+        </p>
+      </div>
+
+      <footer class="article-footer card">
+        <div>
+          <p class="eyebrow">Continue exploring</p>
+          <h2>See the complete system.</h2>
+          <p>The case study covers the wider architecture, working applications, compatibility testing, and current project status.</p>
+        </div>
+        <div class="actions">
+          <a class="button" href="/focaldesk/">View the FocalDesk case study</a>
+          <a class="button secondary" href="https://github.com/sjweiler/focaldesk">Browse the source</a>
+        </div>
+      </footer>
+    </article>
+  </main>
+</BaseLayout>

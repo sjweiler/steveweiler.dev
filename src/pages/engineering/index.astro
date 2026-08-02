@@ -7,15 +7,34 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   description="Engineering notes from Steve Weiler about software, systems architecture, Linux, infrastructure, and AI."
 >
   <main>
-    <section class="page-header">
+    <section class="page-header engineering-header">
       <p class="eyebrow">Writing and technical notes</p>
       <h1>Engineering</h1>
       <p>Architecture, project deep dives, benchmarks, and practical software and systems engineering notes.</p>
     </section>
 
-    <section class="card">
-      <h2>Articles are coming soon.</h2>
-      <p>I’m preparing engineering notes and deeper looks at the decisions behind my projects.</p>
+    <section class="article-feature" aria-labelledby="focaldesk-article-title">
+      <a class="article-feature-media" href="/engineering/focaldesk-frame-loop/" tabindex="-1" aria-hidden="true">
+        <img src="/images/focaldesk/desktop.png" alt="" />
+      </a>
+      <div class="article-feature-copy">
+        <p class="eyebrow">Architecture · FocalDesk</p>
+        <h2 id="focaldesk-article-title">
+          <a href="/engineering/focaldesk-frame-loop/">The frame loop is a boundary</a>
+        </h2>
+        <p class="article-deck">
+          What building a Wayland desktop taught me about keeping the compositor
+          small, moving variable-latency work into services, and designing failure
+          as part of the user experience.
+        </p>
+        <div class="article-meta">
+          <time datetime="2026-08-02">August 2, 2026</time>
+          <span>7 minute read</span>
+        </div>
+        <a class="article-read-link" href="/engineering/focaldesk-frame-loop/">
+          Read the engineering deep dive <span aria-hidden="true">→</span>
+        </a>
+      </div>
     </section>
   </main>
 </BaseLayout>
