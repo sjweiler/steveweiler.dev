@@ -4,7 +4,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
 <BaseLayout
   title="FocalVector Case Study | Steve Weiler"
-  description="A case study of FocalVector, Steve Weiler's durable Rust vector database with exact and HNSW search, metadata filtering, sharding, and OpenRaft replication."
+  description="A case study of FocalVector, Steve Weiler's durable Rust vector database with exact, HNSW, and optional CUDA search, metadata filtering, sharding, and OpenRaft replication."
 >
   <main class="site-main case-study">
     <section class="case-study-hero">
@@ -12,13 +12,14 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         <p class="eyebrow">Project case study</p>
         <div class="status-line">
           <span class="status-badge">Beta · Active development</span>
-          <span>Rust · HNSW · OpenRaft · Axum · CRC32C</span>
+          <span>Rust · HNSW · CUDA / cuBLAS · OpenRaft · CRC32C</span>
         </div>
         <h1>FocalVector</h1>
         <p class="case-study-lede">
           A low-latency vector database that treats search quality, crash
           recovery, and operational boundaries as one system—from an exact
-          correctness engine to persisted HNSW indexes and replicated shards.
+          correctness engine to persisted HNSW indexes, optional CUDA exact
+          search, and replicated shards.
         </p>
         <div class="actions">
           <a class="button" href="https://github.com/sjweiler/focal-vector">View source on GitHub</a>
@@ -30,7 +31,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         <div
           class="project-visual project-visual--vector vector-case-visual"
           role="img"
-          aria-label="FocalVector architecture showing clients entering through HTTP or local IPC; a collection router splitting query and write paths; HNSW and metadata indexes serving queries; and WAL, memtable, and immutable segments providing durable storage"
+          aria-label="FocalVector architecture showing clients entering through HTTP or local IPC; a collection router splitting query and write paths; CPU, HNSW, CUDA, and metadata indexes serving queries; and WAL, memtable, and immutable segments providing durable storage"
         >
           <div class="vector-architecture">
             <div class="vector-flow">
@@ -40,7 +41,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
               <div class="vector-branches">
                 <div>
                   <span class="vector-node">Query executor</span>
-                  <span class="vector-detail">Exact + HNSW + metadata</span>
+                  <span class="vector-detail">CPU exact + HNSW + CUDA + metadata</span>
                 </div>
                 <div>
                   <span class="vector-node">Write coordinator</span>
@@ -75,7 +76,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       <article class="case-stat">
         <span class="case-stat-label">Scope</span>
         <strong>Storage engine to replicated service</strong>
-        <p>Exact and approximate search, typed filters, WAL recovery, immutable segments, backups, sharding, and Raft replication.</p>
+        <p>CPU and CUDA exact search, approximate search, typed filters, WAL recovery, immutable segments, backups, sharding, and Raft replication.</p>
       </article>
       <article class="case-stat">
         <span class="case-stat-label">Current state</span>
@@ -98,8 +99,9 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         </p>
         <p>
           FocalVector starts with an exact-search correctness engine, then layers
-          deterministic HNSW, full-precision reranking, indexed metadata,
-          checksummed persistence, and replication around that reference path.
+          deterministic HNSW, optional cuBLAS-accelerated exact search,
+          full-precision reranking, indexed metadata, checksummed persistence,
+          and replication around that reference path.
           Optimizations are measured against correctness instead of replacing it.
         </p>
       </div>
@@ -113,7 +115,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
           The write coordinator validates a complete mutation batch, appends a
           checksummed WAL frame, synchronizes according to the selected durability
           mode, and only then publishes the mutation to memory. Queries merge
-          immutable graph segments with an exact delta of newer changes.
+          immutable graph segments or an optional CUDA snapshot with an exact
+          CPU delta of newer changes.
         </p>
       </div>
 
@@ -132,6 +135,11 @@ import BaseLayout from "../layouts/BaseLayout.astro";
           <span class="decision-number">03 · Durability</span>
           <h3>Publish immutable state atomically</h3>
           <p>CRC32C-protected WAL and segment files fail closed on corruption, and manifests change only after replacement data is durable.</p>
+        </article>
+        <article class="card decision-card">
+          <span class="decision-number">04 · Optional acceleration</span>
+          <h3>Keep CUDA outside the correctness boundary</h3>
+          <p>A rebuildable GPU snapshot accelerates exact unfiltered queries, while durable state and CPU search remain authoritative.</p>
         </article>
       </div>
     </section>
@@ -230,6 +238,47 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       </div>
     </section>
 
+    <section class="case-study-section engineering-section">
+      <div class="engineering-copy">
+        <p class="eyebrow">Optional CUDA acceleration</p>
+        <h2>Move exact scoring to the GPU without moving durability there.</h2>
+        <p>
+          A feature-gated backend keeps an immutable, full-precision vector
+          matrix on an NVIDIA GPU. Each unfiltered query uploads one vector and
+          uses cuBLAS matrix-vector multiplication to score the snapshot, then
+          deterministic top-k selection and authoritative CPU reranking preserve
+          the database's result semantics.
+        </p>
+        <p>
+          CUDA is both a compile-time feature and a runtime choice. The backend
+          dynamically loads CUDA 12 driver and cuBLAS libraries, so ordinary
+          builds retain their existing CPU and HNSW paths with no CUDA dependency.
+        </p>
+      </div>
+      <div class="tradeoff-list" aria-label="CUDA query workflow">
+        <article class="tradeoff-item">
+          <span>Snapshot</span>
+          <h3>Treat GPU state as a rebuildable cache.</h3>
+          <p>The dense device matrix is reconstructed from authoritative collection points on open and after a successful flush.</p>
+        </article>
+        <article class="tradeoff-item">
+          <span>Score</span>
+          <h3>Use cuBLAS for exact unfiltered search.</h3>
+          <p>Cosine, dot-product, and Euclidean queries share the existing ingestion and scoring semantics.</p>
+        </article>
+        <article class="tradeoff-item">
+          <span>Merge</span>
+          <h3>Keep recent mutations visible on the CPU.</h3>
+          <p>Dirty IDs are excluded from GPU results, searched exactly in the CPU delta, and merged into the final top-k.</p>
+        </article>
+        <article class="tradeoff-item">
+          <span>Fallback</span>
+          <h3>Make acceleration optional and observable.</h3>
+          <p>Preferred mode stays on CPU for small collections or unavailable devices; required mode fails initialization explicitly.</p>
+        </article>
+      </div>
+    </section>
+
     <section class="case-study-section evidence-section">
       <div class="section-heading case-heading">
         <p class="eyebrow">Repository evidence · August 2026</p>
@@ -280,6 +329,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
           <ul class="feature-list">
             <li>Cosine, dot-product, and Euclidean search</li>
             <li>Exact and persisted HNSW query paths</li>
+            <li>Optional CUDA/cuBLAS exact search for unfiltered queries</li>
             <li>Metadata equality and numeric-range indexes</li>
             <li>Checksummed WAL, snapshots, backup, and restore</li>
             <li>Static sharding and deterministic global top-k</li>
@@ -293,6 +343,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
             <li>Long-running mixed read/write soak tests</li>
             <li>Disk-full and real power-loss fault injection</li>
             <li>Multi-million-vector cold-cache benchmarks</li>
+            <li>Workload-specific CUDA versus scalar-int8 HNSW benchmarks</li>
             <li>Deployment-specific partition and restore exercises</li>
             <li>Byte-aware compaction policies and further memory reduction</li>
             <li>No claim of validated 100-million-vector operation yet</li>
@@ -305,7 +356,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       <div>
         <p class="eyebrow">Go deeper</p>
         <h2>Read the storage and distributed-system documentation.</h2>
-        <p>The repository documents the implemented system, benchmark methodology, durability contract, architecture, and remaining operational work.</p>
+        <p>The repository documents the implemented system, benchmark methodology, CUDA acceleration boundary, durability contract, architecture, and remaining operational work.</p>
       </div>
       <div class="doc-links">
         <a href="https://github.com/sjweiler/focal-vector">Repository <span aria-hidden="true">↗</span></a>
